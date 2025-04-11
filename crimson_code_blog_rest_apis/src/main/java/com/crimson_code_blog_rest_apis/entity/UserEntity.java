@@ -1,12 +1,19 @@
 package com.crimson_code_blog_rest_apis.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -14,7 +21,7 @@ import jakarta.persistence.Table;
 public class UserEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	float id;
+	long id;
 
 	@Column(name = "public_id", unique = true, nullable = false, length = 60)
 	String publicId;
@@ -34,6 +41,16 @@ public class UserEntity {
 	@Column(name = "joined_at", columnDefinition = "datetime default CURRENT_TIMESTAMP")
 	private LocalDateTime joinedAt;
 
+	@ManyToMany(fetch = FetchType.EAGER, cascade = {
+			CascadeType.PERSIST, CascadeType.DETACH,
+			CascadeType.MERGE, CascadeType.REFRESH
+	})
+	@JoinTable(name = "users_roles",
+	joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), 
+	inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
+	)
+	List<RoleEntity> roles;
+
 	public UserEntity() {
 
 	}
@@ -49,11 +66,11 @@ public class UserEntity {
 		this.joinedAt = joinedAt;
 	}
 
-	public float getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(float id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -105,4 +122,19 @@ public class UserEntity {
 		this.joinedAt = joinedAt;
 	}
 
+	public List<RoleEntity> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<RoleEntity> roles) {
+		this.roles = roles;
+	}
+
+	public void addRole(RoleEntity role) {
+		if (this.roles == null) {
+			this.roles = new ArrayList<>();
+		}
+
+		this.roles.add(role);
+	}
 }
