@@ -17,6 +17,8 @@ import com.crimson_code_blog_rest_apis.exceptions.CrimsonCodeGlobalException;
 import com.crimson_code_blog_rest_apis.repository.RoleRepository;
 import com.crimson_code_blog_rest_apis.repository.UserRepository;
 import com.crimson_code_blog_rest_apis.services.AuthService;
+import com.crimson_code_blog_rest_apis.services.EmailService;
+import com.crimson_code_blog_rest_apis.utils.JwtUtils;
 import com.crimson_code_blog_rest_apis.utils.UserRoles;
 
 @Service
@@ -25,12 +27,17 @@ public class AuthServiceImpl implements AuthService {
 	private UserRepository userRepository;
 	private ModelMapper modelMapper;
 	private RoleRepository roleRepository;
+	private JwtUtils jwtUtils;
+	private EmailService emailService;
 	
 	@Autowired
-	public AuthServiceImpl(UserRepository userRepository, ModelMapper modelMapper, RoleRepository roleRepository) {
+	public AuthServiceImpl(UserRepository userRepository, ModelMapper modelMapper, RoleRepository roleRepository,
+			JwtUtils jwtUtils, EmailService emailService) {
 		this.userRepository = userRepository;
 		this.modelMapper = modelMapper;
 		this.roleRepository = roleRepository;
+		this.jwtUtils = jwtUtils;
+		this.emailService = emailService;
 	}
 
 
@@ -50,6 +57,9 @@ public class AuthServiceImpl implements AuthService {
 					return roleRepository.save(newUserRole);
 				});
 		
+		String emailVerificationToken = jwtUtils.generateEmailVerificationToken(newUser.getEmail());
+		newUser.setEmailVerificationToken(emailVerificationToken);
+		
 		newUser.addRole(userRole);
 		newUser.setJoinedAt(LocalDateTime.now());
 		
@@ -57,6 +67,8 @@ public class AuthServiceImpl implements AuthService {
 		System.out.println(newUser.getJoinedAt());
 		
 		RegisterResponseModel registerResponse = modelMapper.map(savedUser, RegisterResponseModel.class);
+		
+		emailService.sendVerificationEmail(savedUser.getEmail(), emailVerificationToken);
 		
 		return registerResponse;
 	}
