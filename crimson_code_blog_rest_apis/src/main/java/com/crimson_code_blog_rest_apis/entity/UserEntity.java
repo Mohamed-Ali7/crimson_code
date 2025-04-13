@@ -40,6 +40,9 @@ public class UserEntity {
 
 	@Column(name = "joined_at", columnDefinition = "datetime default CURRENT_TIMESTAMP")
 	private LocalDateTime joinedAt;
+	
+	@Column(name = "email_verification_token", nullable = true, length = 250)
+	private String emailVerificationToken;
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = {
 			CascadeType.PERSIST, CascadeType.DETACH,
@@ -120,6 +123,15 @@ public class UserEntity {
 
 	public void setJoinedAt(LocalDateTime joinedAt) {
 		this.joinedAt = joinedAt;
+	}
+	
+
+	public String getEmailVerificationToken() {
+		return emailVerificationToken;
+	}
+
+	public void setEmailVerificationToken(String emailVerificationToken) {
+		this.emailVerificationToken = emailVerificationToken;
 	}
 
 	public List<RoleEntity> getRoles() {
