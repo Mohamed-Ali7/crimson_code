@@ -3,7 +3,6 @@ package com.crimson_code_blog_rest_apis.services.impl;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.crimson_code_blog_rest_apis.entity.UserEntity;
 import com.crimson_code_blog_rest_apis.repository.UserRepository;
+import com.crimson_code_blog_rest_apis.security.UserPrincipal;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -26,8 +26,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		UserEntity user = userRepository.findByEmail(username)
-				.orElseThrow(() -> new UsernameNotFoundException("Username not found"));
-		return new User(user.getEmail(), user.getPassword(), new ArrayList<>());
+				.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
+		return new UserPrincipal(user);
 	}
 
 }

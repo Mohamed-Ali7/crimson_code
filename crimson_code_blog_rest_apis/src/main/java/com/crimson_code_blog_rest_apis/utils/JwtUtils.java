@@ -3,10 +3,17 @@ package com.crimson_code_blog_rest_apis.utils;
 import java.security.Key;
 import java.util.Date;
 import java.util.Map;
+import java.util.function.Function;
+
+import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.crimson_code_blog_rest_apis.exceptions.CrimsonCodeGlobalException;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -18,11 +25,25 @@ public class JwtUtils {
 	@Value("${emailVerificationTokenExpirationDate}")
 	private long emailVerificationTokenExpirationDate;
 	
+	@Value("${accessTokenExpirationDate}")
+	private long accessTokenExpirationDate;
+
+	@Value("${refreshTokenExpirationDate}")
+	private long refreshTokenExpirationDate;
+	
 	@Value("${tokenSecert}")
 	private String secretKey;
 	
 	public String generateEmailVerificationToken(String username) {
 		return generateJwtToken(username, null, emailVerificationTokenExpirationDate);
+	}
+	
+	public String generateAccessToken(String username, Map<String, Object> claims) {
+		return generateJwtToken(username, claims, accessTokenExpirationDate);
+	}
+	
+	public String generateRefreshToken(String username) {
+		return generateJwtToken(username, null, refreshTokenExpirationDate);
 	}
 	
 	private String generateJwtToken(String subject, Map<String, Object> claims, long expirationDate) {
@@ -40,7 +61,39 @@ public class JwtUtils {
 		return jwt.compact();
 	}
 	
-	Key key() {
+	public String extractUsername(String token) {
+		return getClaim(token, (claims) -> claims.getSubject());
+	}
+	
+	public <T> T getClaim (String token, Function<Claims, T> claimResolver) {
+		Claims claims = extractAllClaims(token);
+		return claimResolver.apply(claims);
+	}
+	
+	private Claims extractAllClaims(String token) {
+		
+		return Jwts.parser()
+				.verifyWith(key())
+				.build()
+				.parseSignedClaims(token)
+				.getPayload();
+	}
+	
+	public void validateJwtToken(String token) {
+		
+		try {
+			Jwts.parser()
+			.verifyWith(key()).build()
+			.parse(token);
+		} catch (ExpiredJwtException ex) {
+			throw new CrimsonCodeGlobalException("Access Token has expired");
+		} catch (Exception ex) {
+			throw new CrimsonCodeGlobalException("Invalid Access token - " + ex.getMessage());
+		}
+		
+	}
+
+	SecretKey key() {
 		return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
 	}
 }
