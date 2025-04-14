@@ -7,6 +7,7 @@ import javax.management.relation.RoleResult;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.crimson_code_blog_rest_apis.dto.request.RegisterRequestModel;
@@ -29,15 +30,17 @@ public class AuthServiceImpl implements AuthService {
 	private RoleRepository roleRepository;
 	private JwtUtils jwtUtils;
 	private EmailService emailService;
+	private PasswordEncoder passwordEncoder;
 	
 	@Autowired
 	public AuthServiceImpl(UserRepository userRepository, ModelMapper modelMapper, RoleRepository roleRepository,
-			JwtUtils jwtUtils, EmailService emailService) {
+			JwtUtils jwtUtils, EmailService emailService, PasswordEncoder passwordEncoder) {
 		this.userRepository = userRepository;
 		this.modelMapper = modelMapper;
 		this.roleRepository = roleRepository;
 		this.jwtUtils = jwtUtils;
 		this.emailService = emailService;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 
@@ -61,10 +64,10 @@ public class AuthServiceImpl implements AuthService {
 		newUser.setEmailVerificationToken(emailVerificationToken);
 		
 		newUser.addRole(userRole);
+		newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
 		newUser.setJoinedAt(LocalDateTime.now());
 		
 		UserEntity savedUser = userRepository.save(newUser);
-		System.out.println(newUser.getJoinedAt());
 		
 		RegisterResponseModel registerResponse = modelMapper.map(savedUser, RegisterResponseModel.class);
 		
