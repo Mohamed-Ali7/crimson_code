@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+
+import com.crimson_code_blog_rest_apis.exceptions.CrimsonCodeGlobalException;
 import com.crimson_code_blog_rest_apis.services.EmailService;
 
 import jakarta.mail.MessagingException;
@@ -48,7 +50,7 @@ public class EmailServiceImpl implements EmailService {
 			
 
 		} catch (MessagingException ex) {
-			throw new RuntimeException(ex.getMessage());
+			throw new CrimsonCodeGlobalException(ex.getMessage());
 		}
 
 		javaMailSender.send(mimeMessage);

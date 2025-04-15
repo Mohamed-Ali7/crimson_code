@@ -10,6 +10,7 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.crimson_code_blog_rest_apis.exceptions.AccessRefreshTokenException;
 import com.crimson_code_blog_rest_apis.exceptions.CrimsonCodeGlobalException;
 
 import io.jsonwebtoken.Claims;
@@ -86,14 +87,13 @@ public class JwtUtils {
 			.verifyWith(key()).build()
 			.parse(token);
 		} catch (ExpiredJwtException ex) {
-			throw new CrimsonCodeGlobalException("Access Token has expired");
+			throw new AccessRefreshTokenException("Access Token has expired");
 		} catch (Exception ex) {
-			throw new CrimsonCodeGlobalException("Invalid Access token - " + ex.getMessage());
+			throw new AccessRefreshTokenException("Invalid Access token - " + ex.getMessage());
 		}
-		
 	}
 
-	SecretKey key() {
+	private SecretKey key() {
 		return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
 	}
 }
