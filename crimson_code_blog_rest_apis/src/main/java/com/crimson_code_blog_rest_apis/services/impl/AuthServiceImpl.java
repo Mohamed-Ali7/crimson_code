@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.management.relation.RoleResult;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +21,7 @@ import com.crimson_code_blog_rest_apis.dto.request.EmailVerificationRequest;
 import com.crimson_code_blog_rest_apis.dto.request.LoginRequestModel;
 import com.crimson_code_blog_rest_apis.dto.request.RegisterRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.LoginResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.RefreshTokenResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.RegisterResponseModel;
 import com.crimson_code_blog_rest_apis.entity.RoleEntity;
 import com.crimson_code_blog_rest_apis.entity.UserEntity;
@@ -106,12 +105,7 @@ public class AuthServiceImpl implements AuthService {
 		
 		UserPrincipal userPrincipal = (UserPrincipal) authenticatedToken.getPrincipal();
 		
-		List<String> userRoles = authenticatedToken.getAuthorities().stream()
-				.map(authority -> authority.getAuthority()).collect(Collectors.toList());
-		Map<String, Object> userClaims = new HashMap<>();
-		
-		userClaims.put("roles", userRoles);
-		userClaims.put("userPublicId", userPrincipal.getPublicId());
+		Map<String, Object> userClaims = generateUserClaims(userPrincipal.getUserEntity());
 		
 		String accessToken = jwtUtils.generateAccessToken(loginRequest.getEmail(), userClaims);
 		String refreshToken = jwtUtils.generateRefreshToken(loginRequest.getEmail());
@@ -156,4 +150,40 @@ public class AuthServiceImpl implements AuthService {
 		userRepository.save(user);
 	}
 
+
+	@Override
+	public RefreshTokenResponseModel refreshAccessToken(String authorizationHeader) {
+
+		if(authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+			throw new JwtTokenException(JwtTokenType.REFRESH_TOKEN.getValue(), "Invalid Refresh token");
+		}
+		
+		String refreshToken = authorizationHeader.substring(7);
+		
+		jwtUtils.validateJwtToken(refreshToken, JwtTokenType.REFRESH_TOKEN.getValue());
+		
+		String userEmail = jwtUtils.extractUsername(refreshToken);
+		
+		UserEntity user = userRepository.findByEmail(userEmail)
+				.orElseThrow(() ->
+				new JwtTokenException(JwtTokenType.REFRESH_TOKEN.getValue(), "Invalid Refresh token"));
+		
+		Map<String, Object> userClaims = generateUserClaims(user);
+		
+		String newAccessToken = jwtUtils.generateAccessToken(userEmail, userClaims);
+		 
+		return new RefreshTokenResponseModel(newAccessToken);
+	}
+	
+	private Map<String, Object> generateUserClaims(UserEntity user) {
+
+		Map<String, Object> userClaims = new HashMap<>();
+		
+		List<String> userRoles = user.getRoles().stream()
+				.map(role -> role.getName()).collect(Collectors.toList());
+		userClaims.put("roles", userRoles);
+		userClaims.put("userPublicId", user.getPublicId());
+		
+		return userClaims;
+	}
 }
