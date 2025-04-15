@@ -41,7 +41,7 @@ public class SecurityConfig {
 		return http
 				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(authorize -> {
-					authorize.requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+					authorize.requestMatchers("/api/auth/**").permitAll()
 					
 					/*
 					 * Make the default error handling endpoint accessible for everyone

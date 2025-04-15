@@ -40,7 +40,7 @@ public class UserPrincipal implements UserDetails {
 
 	@Override
 	public boolean isEnabled() {
-		return UserDetails.super.isEnabled();
+		return userEntity.getIsEmailVerified();
 	}
 	
 	public String getPublicId() {

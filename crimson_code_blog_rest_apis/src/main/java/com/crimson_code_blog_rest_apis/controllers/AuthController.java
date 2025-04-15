@@ -3,16 +3,22 @@ package com.crimson_code_blog_rest_apis.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.crimson_code_blog_rest_apis.dto.request.EmailVerificationRequest;
 import com.crimson_code_blog_rest_apis.dto.request.LoginRequestModel;
 import com.crimson_code_blog_rest_apis.dto.request.RegisterRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.LoginResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.OperationStatusResponse;
 import com.crimson_code_blog_rest_apis.dto.response.RegisterResponseModel;
 import com.crimson_code_blog_rest_apis.services.AuthService;
+import com.crimson_code_blog_rest_apis.utils.OperationName;
+import com.crimson_code_blog_rest_apis.utils.OperationStatus;
 
 import jakarta.validation.Valid;
 
@@ -39,4 +45,32 @@ public class AuthController {
 		return new ResponseEntity<>(authService.login(loginRequest), HttpStatus.OK);
 	}
 	
+	@GetMapping("/email-verification")
+	ResponseEntity<OperationStatusResponse> emailVerification(@RequestParam("token") String verificationToken) {
+		
+		OperationStatusResponse operationResponse = new OperationStatusResponse();
+		
+		operationResponse.setOperationName(OperationName.VERIFIY_USER_EMAIL.name());
+		operationResponse.setOperationStatus(OperationStatus.SUCCESS.name());
+		operationResponse.setMessage("Email verified successfully");
+		
+		authService.emailVerification(verificationToken);
+		
+		return new ResponseEntity<>(operationResponse, HttpStatus.OK);
+	}
+	
+	@PostMapping("/email-verification-request")
+	ResponseEntity<OperationStatusResponse> emailVerificationRequest(
+			@RequestBody EmailVerificationRequest verificationRequest) {
+		
+		OperationStatusResponse operationResponse = new OperationStatusResponse();
+		
+		operationResponse.setOperationName(OperationName.EMAIL_VERIFICATION_TOKEN_REQUEST.name());
+		operationResponse.setOperationStatus(OperationStatus.SUCCESS.name());
+		operationResponse.setMessage("Verification email sent successfully");
+
+		authService.emailVerificationRequest(verificationRequest);
+		
+		return new ResponseEntity<>(operationResponse, HttpStatus.OK);
+	}
 }

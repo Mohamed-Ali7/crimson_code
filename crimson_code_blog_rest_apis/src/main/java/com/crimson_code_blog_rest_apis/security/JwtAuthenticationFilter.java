@@ -4,6 +4,7 @@ import java.io.IOException;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
+import com.crimson_code_blog_rest_apis.utils.JwtTokenType;
 import com.crimson_code_blog_rest_apis.utils.JwtUtils;
 
 import jakarta.servlet.FilterChain;
@@ -50,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		String token = authHeader.substring(7);
 		
 		try {
-			jwtUtils.validateJwtToken(token);
+			jwtUtils.validateJwtToken(token, JwtTokenType.ACCESS_TOKEN.getValue());
 		} catch (Exception ex) {
 			
 			/*
