@@ -8,9 +8,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.crimson_code_blog_rest_apis.dto.request.LoginRequestModel;
 import com.crimson_code_blog_rest_apis.dto.request.RegisterRequestModel;
+import com.crimson_code_blog_rest_apis.dto.response.LoginResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.RegisterResponseModel;
 import com.crimson_code_blog_rest_apis.services.AuthService;
+
+import jakarta.validation.Valid;
 
 @RestController()
 @RequestMapping("/api/auth")
@@ -24,8 +28,15 @@ public class AuthController {
 	}
 	
 	@PostMapping("/register")
-	ResponseEntity<RegisterResponseModel> register(@RequestBody RegisterRequestModel registerRequest) {
+	ResponseEntity<RegisterResponseModel> register(@Valid @RequestBody RegisterRequestModel registerRequest) {
 		
 		return new ResponseEntity<>(authService.register(registerRequest), HttpStatus.CREATED);
 	}
+	
+	@PostMapping("/login")
+	ResponseEntity<LoginResponseModel> login(@Valid @RequestBody LoginRequestModel loginRequest) {
+		
+		return new ResponseEntity<>(authService.login(loginRequest), HttpStatus.OK);
+	}
+	
 }
