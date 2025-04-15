@@ -49,7 +49,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		
 		String token = authHeader.substring(7);
 		
-		jwtUtils.validateJwtToken(token);
+		try {
+			jwtUtils.validateJwtToken(token);
+		} catch (Exception ex) {
+			
+			/*
+			 * Redirect the exception to be handled by the Custom Exception handler
+			 * which in our case GlobalExceptionHandler.class
+			 */
+			exceptionResolver.resolveException(request, response, null, ex);
+			
+			// return to prevent the code from going beyond this point
+			return;
+		}
 		
 		String username = jwtUtils.extractUsername(token);
 		

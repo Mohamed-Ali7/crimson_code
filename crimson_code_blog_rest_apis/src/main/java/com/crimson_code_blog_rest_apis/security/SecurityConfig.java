@@ -47,7 +47,7 @@ public class SecurityConfig {
 					 * Make the default error handling endpoint accessible for everyone
 					 * to make the error shown in the response body when an error occurs
 					 */
-					.requestMatchers("error").permitAll()
+					.requestMatchers("/error").permitAll()
 					.anyRequest().authenticated();
 				})
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
