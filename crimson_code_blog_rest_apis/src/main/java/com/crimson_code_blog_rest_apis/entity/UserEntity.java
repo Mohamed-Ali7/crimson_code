@@ -43,6 +43,9 @@ public class UserEntity {
 	
 	@Column(name = "email_verification_token", nullable = true, length = 250)
 	private String emailVerificationToken;
+	
+	@Column(name = "is_email_verified", nullable = false)
+	private boolean isEmailVerified = false;
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = {
 			CascadeType.PERSIST, CascadeType.DETACH,
@@ -132,6 +135,14 @@ public class UserEntity {
 
 	public void setEmailVerificationToken(String emailVerificationToken) {
 		this.emailVerificationToken = emailVerificationToken;
+	}
+
+	public boolean getIsEmailVerified() {
+		return isEmailVerified;
+	}
+
+	public void setIsEmailVerified(boolean isEmailVerified) {
+		this.isEmailVerified = isEmailVerified;
 	}
 
 	public List<RoleEntity> getRoles() {

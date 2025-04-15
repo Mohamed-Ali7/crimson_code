@@ -8,9 +8,10 @@ import java.util.function.Function;
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.crimson_code_blog_rest_apis.exceptions.AccessRefreshTokenException;
+import com.crimson_code_blog_rest_apis.exceptions.JwtTokenException;
 import com.crimson_code_blog_rest_apis.exceptions.CrimsonCodeGlobalException;
 
 import io.jsonwebtoken.Claims;
@@ -80,16 +81,17 @@ public class JwtUtils {
 				.getPayload();
 	}
 	
-	public void validateJwtToken(String token) {
+	public void validateJwtToken(String token, String tokenType) {
 		
 		try {
 			Jwts.parser()
-			.verifyWith(key()).build()
+			.verifyWith(key())
+			.build()
 			.parse(token);
 		} catch (ExpiredJwtException ex) {
-			throw new AccessRefreshTokenException("Access Token has expired");
+			throw new JwtTokenException(tokenType, tokenType + " Token has expired");
 		} catch (Exception ex) {
-			throw new AccessRefreshTokenException("Invalid Access token - " + ex.getMessage());
+			throw new JwtTokenException(tokenType, "Invalid " + tokenType + " token - " + ex.getMessage());
 		}
 	}
 

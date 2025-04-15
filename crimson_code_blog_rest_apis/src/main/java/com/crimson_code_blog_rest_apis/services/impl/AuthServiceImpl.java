@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.crimson_code_blog_rest_apis.security.UserPrincipal;
+import com.crimson_code_blog_rest_apis.dto.request.EmailVerificationRequest;
 import com.crimson_code_blog_rest_apis.dto.request.LoginRequestModel;
 import com.crimson_code_blog_rest_apis.dto.request.RegisterRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.LoginResponseModel;
@@ -26,10 +27,13 @@ import com.crimson_code_blog_rest_apis.dto.response.RegisterResponseModel;
 import com.crimson_code_blog_rest_apis.entity.RoleEntity;
 import com.crimson_code_blog_rest_apis.entity.UserEntity;
 import com.crimson_code_blog_rest_apis.exceptions.CrimsonCodeGlobalException;
+import com.crimson_code_blog_rest_apis.exceptions.JwtTokenException;
+import com.crimson_code_blog_rest_apis.exceptions.ResourceNotFoundException;
 import com.crimson_code_blog_rest_apis.repository.RoleRepository;
 import com.crimson_code_blog_rest_apis.repository.UserRepository;
 import com.crimson_code_blog_rest_apis.services.AuthService;
 import com.crimson_code_blog_rest_apis.services.EmailService;
+import com.crimson_code_blog_rest_apis.utils.JwtTokenType;
 import com.crimson_code_blog_rest_apis.utils.JwtUtils;
 import com.crimson_code_blog_rest_apis.utils.UserRoles;
 
@@ -113,6 +117,43 @@ public class AuthServiceImpl implements AuthService {
 		String refreshToken = jwtUtils.generateRefreshToken(loginRequest.getEmail());
 		
 		return new LoginResponseModel(accessToken, refreshToken);
+	}
+
+
+	@Override
+	public void emailVerification(String token) {
+		
+		jwtUtils.validateJwtToken(token, JwtTokenType.EMAIL_VERIFICATION_TOKEN.getValue());
+		
+		UserEntity user = userRepository.findByEmailVerificationToken(token)
+				.orElseThrow(() -> new JwtTokenException(JwtTokenType.EMAIL_VERIFICATION_TOKEN.getValue(),
+						"Invalid Email verification token "));
+		
+		user.setEmailVerificationToken(null);
+		user.setIsEmailVerified(true);
+		
+		userRepository.save(user);
+		
+	}
+
+	@Override
+	public void emailVerificationRequest(EmailVerificationRequest verificationRequest) {
+		String userEmail = verificationRequest.getEmail();
+
+		UserEntity user = userRepository.findByEmail(userEmail)
+				.orElseThrow(() -> new ResourceNotFoundException("User does not exist with email: " + userEmail));
+		
+		if (user.getIsEmailVerified()) {
+			throw new CrimsonCodeGlobalException("Your email has been already verified");
+		}
+		
+		String emailVerificationToken = jwtUtils.generateEmailVerificationToken(userEmail);
+		user.setEmailVerificationToken(emailVerificationToken);
+		
+		// Send a new email verification token to user's email address
+		emailService.sendVerificationEmail(userEmail, emailVerificationToken);
+
+		userRepository.save(user);
 	}
 
 }
