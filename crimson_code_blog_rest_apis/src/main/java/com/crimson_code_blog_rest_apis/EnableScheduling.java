@@ -21,9 +21,7 @@ public class EnableScheduling {
 		this.tokenBlacklistRepository = tokenBlacklistRepository;
 	}
 
-
-
-	@Scheduled(cron = "0 * * * * *" ) //every hour
+	@Scheduled(cron = "0 0 * * * *" ) //every hour
 	@Transactional
 	void revokeExpiredTokenFronBlacklist() {
 		tokenBlacklistRepository.deleteAllByExpiresAtBefore(LocalDateTime.now());
