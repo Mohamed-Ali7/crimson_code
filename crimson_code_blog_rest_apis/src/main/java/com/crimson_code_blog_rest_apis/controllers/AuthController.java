@@ -1,6 +1,7 @@
 package com.crimson_code_blog_rest_apis.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,14 +13,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.crimson_code_blog_rest_apis.dto.request.EmailVerificationRequest;
 import com.crimson_code_blog_rest_apis.dto.request.LoginRequestModel;
+import com.crimson_code_blog_rest_apis.dto.request.LogoutRequestModel;
 import com.crimson_code_blog_rest_apis.dto.request.RegisterRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.LoginResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.OperationStatusResponse;
+import com.crimson_code_blog_rest_apis.dto.response.RefreshTokenResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.RegisterResponseModel;
 import com.crimson_code_blog_rest_apis.services.AuthService;
 import com.crimson_code_blog_rest_apis.utils.OperationName;
 import com.crimson_code_blog_rest_apis.utils.OperationStatus;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController()
@@ -73,4 +77,29 @@ public class AuthController {
 		
 		return new ResponseEntity<>(operationResponse, HttpStatus.OK);
 	}
+	
+	@GetMapping("/refresh")
+	public ResponseEntity<RefreshTokenResponseModel> refreshAccessToken (HttpServletRequest request) {
+
+		RefreshTokenResponseModel refreshResponse = 
+				authService.refreshAccessToken(request.getHeader(HttpHeaders.AUTHORIZATION));
+		
+		return new ResponseEntity<>(refreshResponse, HttpStatus.OK);
+	}
+	
+	@PostMapping("/logout")
+	ResponseEntity<OperationStatusResponse> logout(
+			@RequestBody LogoutRequestModel logoutRequest, HttpServletRequest request) {
+		
+		OperationStatusResponse operationResponse = new OperationStatusResponse();
+		
+		operationResponse.setOperationName(OperationName.LOGOUT.name());
+		operationResponse.setOperationStatus(OperationStatus.SUCCESS.name());
+		operationResponse.setMessage("Logged out successfully");
+
+		authService.logout(logoutRequest, request.getHeader(HttpHeaders.AUTHORIZATION));
+		
+		return new ResponseEntity<>(operationResponse, HttpStatus.OK);
+	}
+	
 }

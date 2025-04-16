@@ -43,6 +43,14 @@ public class UserPrincipal implements UserDetails {
 		return userEntity.getIsEmailVerified();
 	}
 	
+	public UserEntity getUserEntity() {
+		return userEntity;
+	}
+
+	public void setUserEntity(UserEntity userEntity) {
+		this.userEntity = userEntity;
+	}
+
 	public String getPublicId() {
 		return userEntity.getPublicId();
 	}

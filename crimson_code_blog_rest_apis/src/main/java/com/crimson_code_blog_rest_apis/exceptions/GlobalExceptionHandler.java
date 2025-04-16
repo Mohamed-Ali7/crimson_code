@@ -36,8 +36,8 @@ public class GlobalExceptionHandler {
 		 * otherwise the returned status code will be 400 (Bad Request)
 		 */
 
-		if (ex.getTokenType().equals(JwtTokenType.ACCESS_TOKEN.getValue()) || 
-				ex.getTokenType().equals(JwtTokenType.REFRESH_TOKEN.getValue())) {
+		if (ex.getTokenType().equals(JwtTokenType.ACCESS_TOKEN) || 
+				ex.getTokenType().equals(JwtTokenType.REFRESH_TOKEN)) {
 			httpStatus = HttpStatus.UNAUTHORIZED;
 		}
 
