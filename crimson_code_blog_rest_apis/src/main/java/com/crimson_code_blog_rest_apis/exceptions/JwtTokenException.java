@@ -2,20 +2,22 @@ package com.crimson_code_blog_rest_apis.exceptions;
 
 import org.springframework.http.HttpStatus;
 
+import com.crimson_code_blog_rest_apis.utils.JwtTokenType;
+
 public class JwtTokenException extends RuntimeException {
 
-	private String tokenType;
+	private JwtTokenType tokenType;
 
-	public JwtTokenException(String tokenType , String message) {
+	public JwtTokenException(JwtTokenType tokenType , String message) {
 		super(message);
 		this.tokenType = tokenType;
 	}
 
-	public String getTokenType() {
+	public JwtTokenType getTokenType() {
 		return tokenType;
 	}
 
-	public void setTokenType(String tokenType) {
+	public void setTokenType(JwtTokenType tokenType) {
 		this.tokenType = tokenType;
 	}
 }

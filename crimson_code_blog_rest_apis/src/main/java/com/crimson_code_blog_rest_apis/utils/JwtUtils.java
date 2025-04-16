@@ -7,11 +7,13 @@ import java.util.function.Function;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.crimson_code_blog_rest_apis.exceptions.JwtTokenException;
+import com.crimson_code_blog_rest_apis.repository.TokenBlacklistRepository;
 import com.crimson_code_blog_rest_apis.exceptions.CrimsonCodeGlobalException;
 
 import io.jsonwebtoken.Claims;
@@ -36,6 +38,17 @@ public class JwtUtils {
 	@Value("${tokenSecert}")
 	private String secretKey;
 	
+	private TokenBlacklistRepository tokenBlacklistRepository;
+	
+	public JwtUtils() {
+		
+	}
+	
+	@Autowired
+	public JwtUtils(TokenBlacklistRepository tokenBlacklistRepository) {
+		this.tokenBlacklistRepository = tokenBlacklistRepository;
+	}
+
 	public String generateEmailVerificationToken(String username) {
 		return generateJwtToken(username, null, emailVerificationTokenExpirationDate);
 	}
@@ -67,6 +80,10 @@ public class JwtUtils {
 		return getClaim(token, (claims) -> claims.getSubject());
 	}
 	
+	public Date extractExpirationDate(String token) {
+		return getClaim(token, (claims) -> claims.getExpiration());
+	}
+	
 	public <T> T getClaim (String token, Function<Claims, T> claimResolver) {
 		Claims claims = extractAllClaims(token);
 		return claimResolver.apply(claims);
@@ -81,7 +98,7 @@ public class JwtUtils {
 				.getPayload();
 	}
 	
-	public void validateJwtToken(String token, String tokenType) {
+	public void validateJwtToken(String token, JwtTokenType tokenType) {
 		
 		try {
 			Jwts.parser()
@@ -89,13 +106,17 @@ public class JwtUtils {
 			.build()
 			.parse(token);
 		} catch (ExpiredJwtException ex) {
-			throw new JwtTokenException(tokenType, tokenType + " Token has expired");
+			throw new JwtTokenException(tokenType, tokenType.getValue() + " Token has expired");
 		} catch (Exception ex) {
-			throw new JwtTokenException(tokenType, "Invalid " + tokenType + " token - " + ex.getMessage());
+			throw new JwtTokenException(tokenType, "Invalid " + tokenType.getValue() + " token - " + ex.getMessage());
 		}
 	}
 
 	private SecretKey key() {
 		return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+	}
+	
+	public boolean tokenIsBlacklisted(String token) {
+		return tokenBlacklistRepository.existsByToken(token);
 	}
 }

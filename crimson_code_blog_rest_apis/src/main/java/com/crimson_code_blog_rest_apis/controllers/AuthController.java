@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.crimson_code_blog_rest_apis.dto.request.EmailVerificationRequest;
 import com.crimson_code_blog_rest_apis.dto.request.LoginRequestModel;
+import com.crimson_code_blog_rest_apis.dto.request.LogoutRequestModel;
 import com.crimson_code_blog_rest_apis.dto.request.RegisterRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.LoginResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.OperationStatusResponse;
@@ -85,4 +86,20 @@ public class AuthController {
 		
 		return new ResponseEntity<>(refreshResponse, HttpStatus.OK);
 	}
+	
+	@PostMapping("/logout")
+	ResponseEntity<OperationStatusResponse> logout(
+			@RequestBody LogoutRequestModel logoutRequest, HttpServletRequest request) {
+		
+		OperationStatusResponse operationResponse = new OperationStatusResponse();
+		
+		operationResponse.setOperationName(OperationName.LOGOUT.name());
+		operationResponse.setOperationStatus(OperationStatus.SUCCESS.name());
+		operationResponse.setMessage("Logged out successfully");
+
+		authService.logout(logoutRequest, request.getHeader(HttpHeaders.AUTHORIZATION));
+		
+		return new ResponseEntity<>(operationResponse, HttpStatus.OK);
+	}
+	
 }
