@@ -1,12 +1,11 @@
 package com.crimson_code_blog_rest_apis.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -15,6 +14,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+
+import com.crimson_code_blog_rest_apis.utils.JwtUtils;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -23,12 +25,15 @@ import jakarta.servlet.http.HttpServletResponse;
 public class SecurityConfig {
 
 	private UserDetailsService userDetailsService;
-	private JwtAuthenticationFilter jwtAuthenticationFilter;
+	private JwtUtils jwtUtils;
+	private HandlerExceptionResolver exceptionResolver;
 	
 	@Autowired
-	public SecurityConfig(UserDetailsService userDetailsService, JwtAuthenticationFilter jwtAuthenticationFilter) {
+	public SecurityConfig(UserDetailsService userDetailsService, JwtUtils jwtUtils,
+			@Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver) {
 		this.userDetailsService = userDetailsService;
-		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+		this.jwtUtils = jwtUtils;
+		this.exceptionResolver = exceptionResolver;
 	}
 
 	@Bean
@@ -41,7 +46,8 @@ public class SecurityConfig {
 		return http
 				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(authorize -> {
-					authorize.requestMatchers("/api/auth/**").permitAll()
+					authorize.requestMatchers("/api/auth/logout").authenticated()
+					.requestMatchers("/api/auth/**").permitAll()
 					
 					/*
 					 * Make the default error handling endpoint accessible for everyone
@@ -51,7 +57,7 @@ public class SecurityConfig {
 					.anyRequest().authenticated();
 				})
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 				
 				/* 
 				 * This handles the unauthorized exceptions manually to return 401
@@ -65,6 +71,10 @@ public class SecurityConfig {
 				.build();
 	}
 	
+	private JwtAuthenticationFilter jwtAuthenticationFilter() {
+		return new JwtAuthenticationFilter(jwtUtils, exceptionResolver, userDetailsService);
+	}
+
 	@Bean
 	DaoAuthenticationProvider daoAuthenticationProvider() {
 		DaoAuthenticationProvider daoAuthProvider = new DaoAuthenticationProvider();

@@ -199,13 +199,11 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	public void logout(LogoutRequestModel logoutRequest, String authorizationHeader) {
 
-		if(authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-			throw new JwtTokenException(JwtTokenType.ACCESS_TOKEN, "Invalid Access token");
-		}
-		
+		/*
+		 * Access token has already checked and validated in the JwtAuthenticationFilter
+		 * because the /logout end point is protected, so we don't need to re-verify it
+		 */
 		String accessToken = authorizationHeader.substring(7);
-		
-		jwtUtils.validateJwtToken(accessToken, JwtTokenType.ACCESS_TOKEN);
 		
 		LocalDateTime accessTokenExpiration = jwtUtils.extractExpirationDate(accessToken)
 				.toInstant()
