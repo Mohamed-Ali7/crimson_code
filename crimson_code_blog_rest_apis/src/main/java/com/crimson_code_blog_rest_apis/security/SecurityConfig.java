@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,6 +24,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
 	private UserDetailsService userDetailsService;
@@ -47,7 +50,18 @@ public class SecurityConfig {
 				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(authorize -> {
 					authorize.requestMatchers("/api/auth/logout").authenticated()
+					
+					/*
+					 * Permit access to get user by public id when using the request /api/users/{userId}
+					 * as well as those with additional path segments 
+					 * as /* means there must be one segment after /api/users/ which in our case the {userId}
+					 * and /** means Zero or more segments which means 
+					 * /api/users/{userId}/posts and /api/users/{userId} will match without any issue.
+					 */
+					.requestMatchers(HttpMethod.GET, "/api/users/*/**").permitAll()
+					.requestMatchers("/api/users/**").authenticated()
 					.requestMatchers("/api/auth/**").permitAll()
+					
 					
 					/*
 					 * Make the default error handling endpoint accessible for everyone
