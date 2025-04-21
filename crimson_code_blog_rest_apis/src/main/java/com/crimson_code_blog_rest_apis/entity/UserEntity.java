@@ -41,6 +41,9 @@ public class UserEntity {
 	@Column(name = "joined_at", columnDefinition = "datetime default CURRENT_TIMESTAMP")
 	private LocalDateTime joinedAt;
 	
+	@Column(name = "profile_img_url")
+	String profileImgUrl;
+	
 	@Column(name = "email_verification_token", nullable = true, length = 250)
 	private String emailVerificationToken;
 	
@@ -62,14 +65,14 @@ public class UserEntity {
 	}
 
 	public UserEntity(String publicId, String email, String password, String firstName, String lastName,
-			LocalDateTime joinedAt) {
-		super();
+			LocalDateTime joinedAt, String profileImgUrl) {
 		this.publicId = publicId;
 		this.email = email;
 		this.password = password;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.joinedAt = joinedAt;
+		this.profileImgUrl = profileImgUrl;
 	}
 
 	public long getId() {
@@ -128,6 +131,13 @@ public class UserEntity {
 		this.joinedAt = joinedAt;
 	}
 	
+	public String getProfileImgUrl() {
+		return profileImgUrl;
+	}
+
+	public void setProfileImgUrl(String profileImgUrl) {
+		this.profileImgUrl = profileImgUrl;
+	}
 
 	public String getEmailVerificationToken() {
 		return emailVerificationToken;

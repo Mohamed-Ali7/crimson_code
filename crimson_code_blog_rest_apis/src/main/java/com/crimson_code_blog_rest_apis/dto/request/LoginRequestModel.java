@@ -1,13 +1,13 @@
 package com.crimson_code_blog_rest_apis.dto.request;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
 public class LoginRequestModel {
 
-	@NotNull(message = "Email cannot be Empty.")
+	@NotBlank(message = "Email cannot be Empty.")
 	private String email;
 	
-	@NotNull(message = "Password cannot be Empty.")
+	@NotBlank(message = "Password cannot be Empty.")
 	private String password;
 	
 	public LoginRequestModel() {

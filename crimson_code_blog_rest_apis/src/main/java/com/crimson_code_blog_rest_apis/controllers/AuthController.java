@@ -3,13 +3,16 @@ package com.crimson_code_blog_rest_apis.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.crimson_code_blog_rest_apis.dto.request.EmailVerificationRequest;
 import com.crimson_code_blog_rest_apis.dto.request.LoginRequestModel;
@@ -18,7 +21,7 @@ import com.crimson_code_blog_rest_apis.dto.request.RegisterRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.LoginResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.OperationStatusResponse;
 import com.crimson_code_blog_rest_apis.dto.response.RefreshTokenResponseModel;
-import com.crimson_code_blog_rest_apis.dto.response.RegisterResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.UserResponseModel;
 import com.crimson_code_blog_rest_apis.services.AuthService;
 import com.crimson_code_blog_rest_apis.utils.OperationName;
 import com.crimson_code_blog_rest_apis.utils.OperationStatus;
@@ -37,10 +40,19 @@ public class AuthController {
 		this.authService = authService;
 	}
 	
-	@PostMapping("/register")
-	ResponseEntity<RegisterResponseModel> register(@Valid @RequestBody RegisterRequestModel registerRequest) {
+	/*
+	 * This request accept multipart/form-data media type because we are sending
+	 * JSON body which is the registered user data and at the same time we are sending
+	 * a file which is the profile image of the user
+	 * 
+	 * Note that the client has to explicitly provide the content type of the user input as application/json
+	 */
+
+	@PostMapping(value = "/register", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+	ResponseEntity<UserResponseModel> register(@Valid @RequestPart("user") RegisterRequestModel registerRequest,
+			@RequestPart("profilePicture") MultipartFile profilePicture) {
 		
-		return new ResponseEntity<>(authService.register(registerRequest), HttpStatus.CREATED);
+		return new ResponseEntity<>(authService.register(registerRequest, profilePicture), HttpStatus.CREATED);
 	}
 	
 	@PostMapping("/login")
@@ -65,7 +77,7 @@ public class AuthController {
 	
 	@PostMapping("/email-verification-request")
 	ResponseEntity<OperationStatusResponse> emailVerificationRequest(
-			@RequestBody EmailVerificationRequest verificationRequest) {
+			@Valid @RequestBody EmailVerificationRequest verificationRequest) {
 		
 		OperationStatusResponse operationResponse = new OperationStatusResponse();
 		

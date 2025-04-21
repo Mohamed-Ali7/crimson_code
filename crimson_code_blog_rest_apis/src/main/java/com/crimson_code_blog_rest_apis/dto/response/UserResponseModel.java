@@ -2,25 +2,27 @@ package com.crimson_code_blog_rest_apis.dto.response;
 
 import java.time.LocalDateTime;
 
-public class RegisterResponseModel {
+public class UserResponseModel {
 	private String publicId;
 	private String email;
 	private String firstName;
 	private String lastName;
 	private LocalDateTime joinedAt;
+	private String profileImgUrl;
 
-	public RegisterResponseModel() {
+	public UserResponseModel() {
 
 	}
 
-	public RegisterResponseModel(String publicId, String email, String firstName, String lastName,
-			LocalDateTime joinedAt) {
+	public UserResponseModel(String publicId, String email, String firstName, String lastName,
+			LocalDateTime joinedAt, String profileImgUrl) {
 		super();
 		this.publicId = publicId;
 		this.email = email;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.joinedAt = joinedAt;
+		this.profileImgUrl = profileImgUrl;
 	}
 
 	public String getPublicId() {
@@ -62,5 +64,12 @@ public class RegisterResponseModel {
 	public void setJoinedAt(LocalDateTime joinedAt) {
 		this.joinedAt = joinedAt;
 	}
-	
+
+	public String getProfileImgUrl() {
+		return profileImgUrl;
+	}
+
+	public void setProfileImgUrl(String profileImgUrl) {
+		this.profileImgUrl = profileImgUrl;
+	}
 }

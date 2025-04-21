@@ -2,6 +2,7 @@ package com.crimson_code_blog_rest_apis.security;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -10,6 +11,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import com.crimson_code_blog_rest_apis.utils.JwtTokenType;
 import com.crimson_code_blog_rest_apis.utils.JwtUtils;
 
+import io.jsonwebtoken.lang.Arrays;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private JwtUtils jwtUtils;
 	private HandlerExceptionResolver exceptionResolver;
 	private UserDetailsService userDetailsService;
-	private Map<HttpMethod, String> skipFilterUrls;
+	private Map<String, List<HttpMethod>> skipFilterUrls;
 	
 	public JwtAuthenticationFilter(JwtUtils jwtUtils, HandlerExceptionResolver exceptionResolver,
 			UserDetailsService userDetailsService) {
@@ -39,44 +41,43 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		
 		skipFilterUrls = new HashMap<>();
 		
-		skipFilterUrls.put(HttpMethod.GET, "/api/auth/**");
-		skipFilterUrls.put(HttpMethod.POST, "/api/auth/**");
+		skipFilterUrls.put("/api/auth/**", List.of(HttpMethod.GET, HttpMethod.POST));
+		skipFilterUrls.put("/api/users/*/**", List.of(HttpMethod.GET));
+		skipFilterUrls.put("/api/users/*",List.of(HttpMethod.POST));
+		skipFilterUrls.put("/images/**", List.of(HttpMethod.GET));
 	}
-	
-	
 
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
 		String url = "";
-		String httpMethod = "";
+		List<HttpMethod> httpMethods;
 
-		if (request.getServletPath().equals("/api/auth/logout")) {
+		if (request.getServletPath().equals("/api/auth/logout") || 
+				request.getServletPath().equals("/api/users/me")) {
 			return false;
 		}
 		
-		for (Map.Entry<HttpMethod, String> entry : skipFilterUrls.entrySet()) {
+		for (Map.Entry<String, List<HttpMethod>> entry : skipFilterUrls.entrySet()) {
 			
-			httpMethod = entry.getKey().name();
-			url = entry.getValue();
+			url = entry.getKey();
+			httpMethods = entry.getValue();
 			
-			if (new AntPathRequestMatcher(url, httpMethod).matches(request)) {
-				return true;
+			for (HttpMethod method : httpMethods) {
+				if (new AntPathRequestMatcher(url, method.name()).matches(request)) {
+					return true;
+				}
 			}
-			
-			
 		}
 		
 		return false;
 	}
-
-
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 
 		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
+		
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 			doFilter(request, response, filterChain);
 			return;

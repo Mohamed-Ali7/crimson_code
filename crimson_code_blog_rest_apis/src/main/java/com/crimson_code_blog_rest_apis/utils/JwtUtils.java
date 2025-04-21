@@ -35,6 +35,8 @@ public class JwtUtils {
 	@Value("${refreshTokenExpirationDate}")
 	private long refreshTokenExpirationDate;
 	
+	@Value("${passwordResetTokenExpirationDate}")
+	private long passwordResetTokenExpirationDate;
 	@Value("${tokenSecert}")
 	private String secretKey;
 	
@@ -59,6 +61,10 @@ public class JwtUtils {
 	
 	public String generateRefreshToken(String username) {
 		return generateJwtToken(username, null, refreshTokenExpirationDate);
+	}
+	
+	public String generatePasswordResetToken(String username) {
+		return generateJwtToken(username, null, passwordResetTokenExpirationDate);
 	}
 	
 	private String generateJwtToken(String subject, Map<String, Object> claims, long expirationDate) {

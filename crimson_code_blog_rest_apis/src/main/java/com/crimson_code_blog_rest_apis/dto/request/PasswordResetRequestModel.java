@@ -2,18 +2,19 @@ package com.crimson_code_blog_rest_apis.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
-public class EmailVerificationRequest {
-
+public class PasswordResetRequestModel {
+	
 	@NotBlank(message = "Email cannot be Empty.")
 	@Email(message = "Email must be a well-formed, like : name@crimson-code.com.")
 	private String email;
-	
-	public EmailVerificationRequest () {
-		
+
+	public PasswordResetRequestModel() {
+
 	}
 
-	public EmailVerificationRequest(String email) {
+	public PasswordResetRequestModel(String email) {
 		this.email = email;
 	}
 
@@ -24,4 +25,5 @@ public class EmailVerificationRequest {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+
 }
