@@ -255,7 +255,7 @@ public class AuthServiceImpl implements AuthService {
 			
 			Files.copy(file.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
 			
-			return "/images/profile_pictures/" + fileName;
+			return "/images/" + fileName;
 			
 		} catch (IOException e) {
 			throw new CrimsonCodeGlobalException("Failed to store user's profile picture");
