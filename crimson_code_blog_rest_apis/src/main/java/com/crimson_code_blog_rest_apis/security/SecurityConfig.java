@@ -50,6 +50,7 @@ public class SecurityConfig {
 				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(authorize -> {
 					authorize.requestMatchers("/api/auth/logout").authenticated()
+					.requestMatchers(HttpMethod.GET, "/api/users/me").authenticated()
 					
 					/*
 					 * Permit access to get user by public id when using the request /api/users/{userId}
@@ -59,6 +60,10 @@ public class SecurityConfig {
 					 * /api/users/{userId}/posts and /api/users/{userId} will match without any issue.
 					 */
 					.requestMatchers(HttpMethod.GET, "/api/users/*/**").permitAll()
+					.requestMatchers(HttpMethod.GET, "/images/**").permitAll()
+					
+					// matches /api/users/password-reset-request and /api/users/password-reset
+					.requestMatchers(HttpMethod.POST, "/api/users/*").permitAll()
 					.requestMatchers("/api/users/**").authenticated()
 					.requestMatchers("/api/auth/**").permitAll()
 					

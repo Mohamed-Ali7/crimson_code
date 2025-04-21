@@ -22,6 +22,13 @@ public class EmailServiceImpl implements EmailService {
 			+ "<p>Click on the following link to verify your email address</p>"
 			+ "<a href='http://localhost:8080/api/auth/email-verification?token=${tokenValue}'>"
 			+ "Your link to complete your registration</a>";
+	
+	private final String PASSWORD_RESET_SUBJECT = "Password Reset Request";
+	
+	private final String PASSWORD_RESET_HTML_BODY = "<h1>Due to Your Request to Reset Your Password</h1> "
+			+ "<p>Click on the following link to proceed your password reset process</p>"
+			+ "<a href='http://localhost:8080/password-reset?token=${tokenValue}'>"
+			+ "Your link to reset your password</a>";
 
 	private JavaMailSender javaMailSender;
 
@@ -36,6 +43,13 @@ public class EmailServiceImpl implements EmailService {
 		sendEmail(email, EMAIL_VERIFICATION_SUBJECT, htmlBodyWithToken);
 	}
 
+	@Override
+	public void sendPasswordResetEmail(String email, String token) {
+		String htmlBodyWithToken = PASSWORD_RESET_HTML_BODY.replace("${tokenValue}", token);
+		sendEmail(email, PASSWORD_RESET_SUBJECT, htmlBodyWithToken);
+		
+	}
+	
 	private void sendEmail(String sendTo, String subject, String htmlBody) {
 
 		MimeMessage mimeMessage = javaMailSender.createMimeMessage();

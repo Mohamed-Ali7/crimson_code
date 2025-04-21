@@ -1,5 +1,10 @@
 package com.crimson_code_blog_rest_apis.services.impl;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -18,6 +23,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.crimson_code_blog_rest_apis.security.UserPrincipal;
 import com.crimson_code_blog_rest_apis.dto.request.EmailVerificationRequest;
@@ -26,7 +32,7 @@ import com.crimson_code_blog_rest_apis.dto.request.LogoutRequestModel;
 import com.crimson_code_blog_rest_apis.dto.request.RegisterRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.LoginResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.RefreshTokenResponseModel;
-import com.crimson_code_blog_rest_apis.dto.response.RegisterResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.UserResponseModel;
 import com.crimson_code_blog_rest_apis.entity.RoleEntity;
 import com.crimson_code_blog_rest_apis.entity.TokenBlacklistEntity;
 import com.crimson_code_blog_rest_apis.entity.UserEntity;
@@ -70,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
 
 
 	@Override
-	public RegisterResponseModel register(RegisterRequestModel registerRequest) {
+	public UserResponseModel register(RegisterRequestModel registerRequest, MultipartFile profilePicture) {
 		if(userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
 			throw new CrimsonCodeGlobalException("This email already exists");
 		}
@@ -92,9 +98,14 @@ public class AuthServiceImpl implements AuthService {
 		newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
 		newUser.setJoinedAt(LocalDateTime.now());
 		
+		if (profilePicture != null && !profilePicture.isEmpty()) {
+			String profileImageUrl = saveUserProfileImage(profilePicture, newUser.getPublicId());
+			newUser.setProfileImgUrl(profileImageUrl);
+		}
+
 		UserEntity savedUser = userRepository.save(newUser);
 		
-		RegisterResponseModel registerResponse = modelMapper.map(savedUser, RegisterResponseModel.class);
+		UserResponseModel registerResponse = modelMapper.map(savedUser, UserResponseModel.class);
 		
 		emailService.sendVerificationEmail(savedUser.getEmail(), emailVerificationToken);
 		
@@ -225,6 +236,30 @@ public class AuthServiceImpl implements AuthService {
 				List.of(accessTokenBlacklistEntity, refreshTokenBlacklistEntity)));
 		
 		SecurityContextHolder.getContext().setAuthentication(null);
+		
+	}
+	
+	private String saveUserProfileImage(MultipartFile file, String publicUserId) {
+		String fileName = publicUserId + "_" + file.getOriginalFilename();
+		Path uploadPath = Paths.get("uploads/profile_pictures/" + fileName);
+	
+		if (!List.of("image/jpeg", "image/png", "image/webp").contains(file.getContentType()))  {
+			throw new CrimsonCodeGlobalException("Invalid content type.");
+		}
+
+		try {
+			
+			if (!Files.exists(uploadPath)) {
+				Files.createDirectories(uploadPath);
+			}
+			
+			Files.copy(file.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
+			
+			return "/images/profile_pictures/" + fileName;
+			
+		} catch (IOException e) {
+			throw new CrimsonCodeGlobalException("Failed to store user's profile picture");
+		}
 		
 	}
 }

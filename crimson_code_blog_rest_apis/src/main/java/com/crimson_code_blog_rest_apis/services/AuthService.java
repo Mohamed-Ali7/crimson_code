@@ -1,16 +1,18 @@
 package com.crimson_code_blog_rest_apis.services;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.crimson_code_blog_rest_apis.dto.request.EmailVerificationRequest;
 import com.crimson_code_blog_rest_apis.dto.request.LoginRequestModel;
 import com.crimson_code_blog_rest_apis.dto.request.LogoutRequestModel;
 import com.crimson_code_blog_rest_apis.dto.request.RegisterRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.LoginResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.RefreshTokenResponseModel;
-import com.crimson_code_blog_rest_apis.dto.response.RegisterResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.UserResponseModel;
 
 public interface AuthService {
 
-	RegisterResponseModel register(RegisterRequestModel registerRequest);
+	UserResponseModel register(RegisterRequestModel registerRequest, MultipartFile profilePicture);
 	LoginResponseModel login(LoginRequestModel loginRequest);
 	void emailVerification(String token);
 	void emailVerificationRequest(EmailVerificationRequest verificationRequest);

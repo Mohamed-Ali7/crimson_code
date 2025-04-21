@@ -1,20 +1,21 @@
 package com.crimson_code_blog_rest_apis.dto.request;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class RegisterRequestModel {
 
-	@NotNull(message = "Email cannot be Empty.")
+	@NotBlank(message = "Email cannot be Empty.")
 	@Email(message = "Email must be a well-formed, like : name@crimson-code.com.")
 	private String email;
 	
-	@NotNull(message = "Password cannot be Empty.")
+	@NotBlank(message = "Password cannot be Empty.")
 	@Size(min = 6, max = 30, message = "Password must be 6 to 30 characters long.")
 	private String password;
 	
-	@NotNull(message = "First name cannot be Empty.")
+	@NotBlank(message = "First name cannot be Empty.")
 	@Size(min = 2, max = 30, message = "First name must be 2 to 30 characters long.")
 	private String firstName;
 	

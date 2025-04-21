@@ -2,6 +2,7 @@ package com.crimson_code_blog_rest_apis.services.impl;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -10,27 +11,56 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.crimson_code_blog_rest_apis.dto.request.ChangePasswordRequestModel;
+import com.crimson_code_blog_rest_apis.dto.request.PasswordResetConfirmationRequest;
+import com.crimson_code_blog_rest_apis.dto.request.PasswordResetRequestModel;
 import com.crimson_code_blog_rest_apis.dto.request.UpdateUserRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.UserResponseModel;
+import com.crimson_code_blog_rest_apis.entity.PasswordResetTokenEntity;
 import com.crimson_code_blog_rest_apis.entity.UserEntity;
 import com.crimson_code_blog_rest_apis.exceptions.CrimsonCodeGlobalException;
+import com.crimson_code_blog_rest_apis.exceptions.JwtTokenException;
 import com.crimson_code_blog_rest_apis.exceptions.ResourceNotFoundException;
+import com.crimson_code_blog_rest_apis.repository.PasswordResetTokenRepository;
 import com.crimson_code_blog_rest_apis.repository.UserRepository;
+import com.crimson_code_blog_rest_apis.security.UserPrincipal;
+import com.crimson_code_blog_rest_apis.services.EmailService;
 import com.crimson_code_blog_rest_apis.services.UserService;
+import com.crimson_code_blog_rest_apis.utils.JwtTokenType;
+import com.crimson_code_blog_rest_apis.utils.JwtUtils;
 
 @Service
 public class UserServiceImpl implements UserService {
 
 	private UserRepository userRepository;
 	private ModelMapper modelMapper;
+	private JwtUtils jwtUtils;
+	private EmailService emailService;
+	private PasswordResetTokenRepository passwordResetTokenRepository;
+	private PasswordEncoder passwordEncoder;
 	
 	@Autowired
-	public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper) {
+	public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper, JwtUtils jwtUtils,
+			EmailService emailService, PasswordResetTokenRepository passwordResetTokenRepository,
+			PasswordEncoder passwordEncoder) {
 		this.userRepository = userRepository;
 		this.modelMapper = modelMapper;
+		this.jwtUtils = jwtUtils;
+		this.emailService = emailService;
+		this.passwordResetTokenRepository = passwordResetTokenRepository;
+		this.passwordEncoder = passwordEncoder;
+	}
+
+	@Override
+	public UserResponseModel getCurrentUser(UserPrincipal userPrincipal) {
+		if (userPrincipal == null || userPrincipal.getUserEntity() == null) {
+		    throw new CrimsonCodeGlobalException("Authenticated user not found");
+		}
+		return modelMapper.map(userPrincipal.getUserEntity(), UserResponseModel.class);
 	}
 
 	@Override
@@ -103,6 +133,89 @@ public class UserServiceImpl implements UserService {
 		
 		userRepository.delete(userEntity);
 		
+	}
+
+	@Override
+	public void passwordResetRequest(PasswordResetRequestModel passwordResetRequest) {
+		String userEmail = passwordResetRequest.getEmail();
+		
+		UserEntity user = userRepository.findByEmail(userEmail)
+				.orElseThrow(() -> new ResourceNotFoundException("User does not exist with email: " + userEmail));
+		
+		Optional <PasswordResetTokenEntity> oldPasswordResetToken =
+				passwordResetTokenRepository.findByUserId(user.getId());
+		
+		if (oldPasswordResetToken.isPresent()) {
+			passwordResetTokenRepository.delete(oldPasswordResetToken.get());
+		}
+		
+		String passwordResetToken = jwtUtils.generatePasswordResetToken(userEmail);
+		
+		PasswordResetTokenEntity passwordResetTokenEntity = new PasswordResetTokenEntity();
+		
+		passwordResetTokenEntity.setToken(passwordResetToken);
+		passwordResetTokenEntity.setUser(user);
+
+		emailService.sendPasswordResetEmail(userEmail, passwordResetToken);
+
+		passwordResetTokenRepository.save(passwordResetTokenEntity);
+		
+	}
+
+	@Override
+	public void resetPassword(PasswordResetConfirmationRequest passwordResetConfirmation) {
+
+		String passwordResetToken = passwordResetConfirmation.getToken();
+
+		jwtUtils.validateJwtToken(passwordResetToken, JwtTokenType.PASSWORD_RESET_TOKEN);
+		
+		PasswordResetTokenEntity passwordResetTokenEntity = 
+				passwordResetTokenRepository.findByToken(passwordResetToken)
+				.orElseThrow(() -> 
+				new JwtTokenException(JwtTokenType.PASSWORD_RESET_TOKEN, "Invalid Password reset token")
+				);
+		
+		String newPassword = passwordResetConfirmation.getNewPassword();
+		String confirmPassword = passwordResetConfirmation.getConfirmPassword();
+		
+		if (!newPassword.equals(confirmPassword)) {
+			throw new CrimsonCodeGlobalException("The new password and confirm password do not match");
+		}
+		
+		UserEntity user = passwordResetTokenEntity.getUser();
+		
+		user.setPassword(passwordEncoder.encode(newPassword));
+		
+		userRepository.save(user);
+		
+		passwordResetTokenRepository.delete(passwordResetTokenEntity);
+		
+	}
+
+	@Override
+	public void changePassword(UserPrincipal userPrincipal, ChangePasswordRequestModel changePasswordRequest) {
+
+		String currentPassword = changePasswordRequest.getCurrentPassword();
+		String newPassword = changePasswordRequest.getNewPassword();
+		String confirmPassword = changePasswordRequest.getConfirmPassword();
+		
+		if (!newPassword.equals(confirmPassword)) {
+			throw new CrimsonCodeGlobalException("The new password and confirm password do not match");
+		}
+		
+		UserEntity user = userPrincipal.getUserEntity();
+		
+		if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+			throw new CrimsonCodeGlobalException("Current password is incorrect.");
+		}
+		
+		if (currentPassword.equals(newPassword)) {
+			return;
+		}
+		
+		user.setPassword(passwordEncoder.encode(newPassword));
+		
+		userRepository.save(user);
 	}
 
 }

@@ -1,10 +1,12 @@
 package com.crimson_code_blog_rest_apis.exceptions;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -36,9 +38,8 @@ public class GlobalExceptionHandler {
 		 * otherwise the returned status code will be 400 (Bad Request)
 		 */
 
-		if (ex.getTokenType().equals(JwtTokenType.ACCESS_TOKEN) || 
-				ex.getTokenType().equals(JwtTokenType.REFRESH_TOKEN)) {
-			httpStatus = HttpStatus.UNAUTHORIZED;
+		if (ex.getTokenType() != null && ex.getTokenType().isAuthToken()) {
+		    httpStatus = HttpStatus.UNAUTHORIZED;
 		}
 
 		ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(),
@@ -65,5 +66,19 @@ public class GlobalExceptionHandler {
 		ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(),
 				HttpStatus.UNAUTHORIZED.value(), message, request.getRequestURI());
 		return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+	}
+	
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<ErrorResponse> handleValidationException(
+	        MethodArgumentNotValidException ex, HttpServletRequest request) {
+
+	    String errorMsg = ex.getBindingResult().getFieldErrors().stream()
+	            .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+	            .collect(Collectors.joining(", "));
+
+	    ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(),
+	            HttpStatus.BAD_REQUEST.value(), errorMsg, request.getRequestURI());
+
+	    return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 	}
 }
