@@ -61,12 +61,13 @@ public class SecurityConfig {
 					 */
 					.requestMatchers(HttpMethod.GET, "/api/users/*/**").permitAll()
 					.requestMatchers(HttpMethod.GET, "/images/**").permitAll()
+					.requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
 					
 					// matches /api/users/password-reset-request and /api/users/password-reset
 					.requestMatchers(HttpMethod.POST, "/api/users/*").permitAll()
-					.requestMatchers("/api/users/**").authenticated()
 					.requestMatchers("/api/auth/**").permitAll()
 					
+					.requestMatchers("/api/users/**").authenticated()
 					
 					/*
 					 * Make the default error handling endpoint accessible for everyone
