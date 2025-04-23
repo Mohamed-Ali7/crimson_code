@@ -1,13 +1,13 @@
 package com.crimson_code_blog_rest_apis.dto.response;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 public class UserResponseModel {
 	private String publicId;
 	private String email;
 	private String firstName;
 	private String lastName;
-	private LocalDateTime joinedAt;
+	private OffsetDateTime joinedAt;
 	private String profileImgUrl;
 
 	public UserResponseModel() {
@@ -15,7 +15,7 @@ public class UserResponseModel {
 	}
 
 	public UserResponseModel(String publicId, String email, String firstName, String lastName,
-			LocalDateTime joinedAt, String profileImgUrl) {
+			OffsetDateTime joinedAt, String profileImgUrl) {
 		super();
 		this.publicId = publicId;
 		this.email = email;
@@ -57,11 +57,11 @@ public class UserResponseModel {
 		this.lastName = lastName;
 	}
 
-	public LocalDateTime getJoinedAt() {
+	public OffsetDateTime getJoinedAt() {
 		return joinedAt;
 	}
 
-	public void setJoinedAt(LocalDateTime joinedAt) {
+	public void setJoinedAt(OffsetDateTime joinedAt) {
 		this.joinedAt = joinedAt;
 	}
 

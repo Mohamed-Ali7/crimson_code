@@ -6,7 +6,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -96,7 +98,7 @@ public class AuthServiceImpl implements AuthService {
 		
 		newUser.addRole(userRole);
 		newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
-		newUser.setJoinedAt(LocalDateTime.now());
+		newUser.setJoinedAt(OffsetDateTime.now(ZoneOffset.UTC));
 		
 		if (profilePicture != null && !profilePicture.isEmpty()) {
 			String profileImageUrl = saveUserProfileImage(profilePicture, newUser.getPublicId());

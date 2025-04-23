@@ -1,6 +1,6 @@
 package com.crimson_code_blog_rest_apis.entity;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +38,8 @@ public class UserEntity {
 	@Column(name = "last_name", length = 50)
 	String lastName;
 
-	@Column(name = "joined_at", columnDefinition = "datetime default CURRENT_TIMESTAMP")
-	private LocalDateTime joinedAt;
+	@Column(name = "joined_at", nullable = false, columnDefinition = "TIMESTAMP")
+	private OffsetDateTime joinedAt;
 	
 	@Column(name = "profile_img_url")
 	String profileImgUrl;
@@ -65,7 +65,7 @@ public class UserEntity {
 	}
 
 	public UserEntity(String publicId, String email, String password, String firstName, String lastName,
-			LocalDateTime joinedAt, String profileImgUrl) {
+			OffsetDateTime joinedAt, String profileImgUrl) {
 		this.publicId = publicId;
 		this.email = email;
 		this.password = password;
@@ -123,11 +123,11 @@ public class UserEntity {
 		this.lastName = lastName;
 	}
 
-	public LocalDateTime getJoinedAt() {
+	public OffsetDateTime getJoinedAt() {
 		return joinedAt;
 	}
 
-	public void setJoinedAt(LocalDateTime joinedAt) {
+	public void setJoinedAt(OffsetDateTime joinedAt) {
 		this.joinedAt = joinedAt;
 	}
 	
