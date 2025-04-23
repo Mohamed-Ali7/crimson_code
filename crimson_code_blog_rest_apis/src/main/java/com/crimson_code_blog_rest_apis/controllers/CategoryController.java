@@ -18,6 +18,7 @@ import com.crimson_code_blog_rest_apis.dto.request.CategoryRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.CategoryResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.OperationStatusResponse;
 import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.PostResponseModel;
 import com.crimson_code_blog_rest_apis.services.CategoryService;
 import com.crimson_code_blog_rest_apis.utils.OperationName;
 import com.crimson_code_blog_rest_apis.utils.OperationStatus;
@@ -81,5 +82,18 @@ public class CategoryController {
 		operationStatus.setMessage("The category has been deleted successfully");
 		
 		return operationStatus;
+	}
+	
+	@GetMapping("/{categoryId}/posts")
+	public ResponseEntity<PageResponseModel<PostResponseModel>> getCategoryPosts(@PathVariable long categoryId,
+			@RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "15") int pageSize,
+			@RequestParam(name = "sort_by", defaultValue = "createdAt") String sortBy,
+			@RequestParam(name = "sort_dir", defaultValue = "asc") String sortDir
+			){
+		
+		return new ResponseEntity<>(
+				categoryService.getCategoryPosts(categoryId, page, pageSize, sortBy, sortDir), HttpStatus.OK
+				);
 	}
 }

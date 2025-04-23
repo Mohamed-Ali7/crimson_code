@@ -3,6 +3,7 @@ package com.crimson_code_blog_rest_apis.services.impl;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -19,13 +20,16 @@ import com.crimson_code_blog_rest_apis.dto.request.PasswordResetConfirmationRequ
 import com.crimson_code_blog_rest_apis.dto.request.PasswordResetRequestModel;
 import com.crimson_code_blog_rest_apis.dto.request.UpdateUserRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.PostResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.UserResponseModel;
 import com.crimson_code_blog_rest_apis.entity.PasswordResetTokenEntity;
+import com.crimson_code_blog_rest_apis.entity.PostEntity;
 import com.crimson_code_blog_rest_apis.entity.UserEntity;
 import com.crimson_code_blog_rest_apis.exceptions.CrimsonCodeGlobalException;
 import com.crimson_code_blog_rest_apis.exceptions.JwtTokenException;
 import com.crimson_code_blog_rest_apis.exceptions.ResourceNotFoundException;
 import com.crimson_code_blog_rest_apis.repository.PasswordResetTokenRepository;
+import com.crimson_code_blog_rest_apis.repository.PostRepository;
 import com.crimson_code_blog_rest_apis.repository.UserRepository;
 import com.crimson_code_blog_rest_apis.security.UserPrincipal;
 import com.crimson_code_blog_rest_apis.services.EmailService;
@@ -42,17 +46,20 @@ public class UserServiceImpl implements UserService {
 	private EmailService emailService;
 	private PasswordResetTokenRepository passwordResetTokenRepository;
 	private PasswordEncoder passwordEncoder;
+	private PostRepository postRepository;
 	
 	@Autowired
 	public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper, JwtUtils jwtUtils,
 			EmailService emailService, PasswordResetTokenRepository passwordResetTokenRepository,
-			PasswordEncoder passwordEncoder) {
+			PasswordEncoder passwordEncoder, PostRepository postRepository) {
+
 		this.userRepository = userRepository;
 		this.modelMapper = modelMapper;
 		this.jwtUtils = jwtUtils;
 		this.emailService = emailService;
 		this.passwordResetTokenRepository = passwordResetTokenRepository;
 		this.passwordEncoder = passwordEncoder;
+		this.postRepository = postRepository;
 	}
 
 	@Override
@@ -75,13 +82,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public PageResponseModel<UserResponseModel> getAllUser(int page, int PageSize, String sortBy, String sortDir) {
+	public PageResponseModel<UserResponseModel> getAllUser(int page, int pageSize, String sortBy, String sortDir) {
 
 		page = page > 0 ? page - 1 : page; // To make pages start from 1 not 0 as it's more user-friendly
 		
 		Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
 		
-		Pageable userPageable = PageRequest.of(page, PageSize, sort);
+		Pageable userPageable = PageRequest.of(page, pageSize, sort);
 		
 		Page<UserEntity> usersPage = userRepository.findAll(userPageable);
 		
@@ -216,6 +223,38 @@ public class UserServiceImpl implements UserService {
 		user.setPassword(passwordEncoder.encode(newPassword));
 		
 		userRepository.save(user);
+	}
+
+	@Override
+	public PageResponseModel<PostResponseModel> getUserPosts(String publicId, int page, int pageSize, String sortBy,
+			String sortDir) {
+
+		UserEntity userEntity = userRepository.findByPublicId(publicId)
+				.orElseThrow(() -> new ResourceNotFoundException("User does not exist with id: " + publicId));
+		
+		page = page > 0 ? page - 1 : page; // To make pages start from 1 not 0 as it's more user-friendly
+		
+		Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+		
+		Pageable pageable = PageRequest.of(page, pageSize, sort);
+		
+		Page<PostEntity> userPostsPage = postRepository.findAllByUserId(userEntity.getId(), pageable);
+		
+		List<PostEntity> userPosts = userPostsPage.getContent();
+		
+		List<PostResponseModel> userPostsResponse = userPosts.stream()
+				.map(post -> PostServiceImpl.mapToPostResponse(post)).collect(Collectors.toList());
+		
+		PageResponseModel<PostResponseModel> pageResponse = new PageResponseModel<>();
+		
+		pageResponse.setContent(userPostsResponse);
+		pageResponse.setPageNumber(++page);
+		pageResponse.setPageSize(userPostsPage.getNumberOfElements());
+		pageResponse.setTotalElements(userPostsPage.getTotalElements());
+		pageResponse.setTotalPages(userPostsPage.getTotalPages());
+		pageResponse.setIsLast(userPostsPage.isLast());
+		
+		return pageResponse;
 	}
 
 }

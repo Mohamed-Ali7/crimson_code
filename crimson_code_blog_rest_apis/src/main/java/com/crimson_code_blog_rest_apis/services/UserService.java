@@ -5,6 +5,7 @@ import com.crimson_code_blog_rest_apis.dto.request.PasswordResetConfirmationRequ
 import com.crimson_code_blog_rest_apis.dto.request.PasswordResetRequestModel;
 import com.crimson_code_blog_rest_apis.dto.request.UpdateUserRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.PostResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.UserResponseModel;
 import com.crimson_code_blog_rest_apis.security.UserPrincipal;
 
@@ -20,4 +21,6 @@ public interface UserService {
 	void passwordResetRequest(PasswordResetRequestModel passwordResetRequest);
 	void resetPassword(PasswordResetConfirmationRequest passwordResetConfirmation);
 	void changePassword(UserPrincipal userPrincipal, ChangePasswordRequestModel changePasswordRequest);
+	PageResponseModel<PostResponseModel> getUserPosts(String publicId, int page, int pageSize,
+			String sortBy, String sortDir);
 }

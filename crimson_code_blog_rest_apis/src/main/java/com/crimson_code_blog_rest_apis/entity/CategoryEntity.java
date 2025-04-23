@@ -1,11 +1,15 @@
 package com.crimson_code_blog_rest_apis.entity;
 
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -21,6 +25,14 @@ public class CategoryEntity {
 
 	@Column(name = "description", nullable = false)
 	private String description;
+
+	@OneToMany(mappedBy = "category", cascade = {
+			CascadeType.DETACH,
+			CascadeType.MERGE,
+			CascadeType.PERSIST,
+			CascadeType.REFRESH
+	})
+	private List<PostEntity> posts;
 
 	public CategoryEntity() {
 
@@ -53,6 +65,14 @@ public class CategoryEntity {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public List<PostEntity> getPosts() {
+		return posts;
+	}
+
+	public void setPosts(List<PostEntity> posts) {
+		this.posts = posts;
 	}
 
 }

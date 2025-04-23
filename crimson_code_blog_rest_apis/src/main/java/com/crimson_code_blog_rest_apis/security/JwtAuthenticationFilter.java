@@ -46,6 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		skipFilterUrls.put("/api/users/*",List.of(HttpMethod.POST));
 		skipFilterUrls.put("/images/**", List.of(HttpMethod.GET));
 		skipFilterUrls.put("/api/categories/**", List.of(HttpMethod.GET));
+		skipFilterUrls.put("/api/posts/**", List.of(HttpMethod.GET));
 	}
 
 	@Override

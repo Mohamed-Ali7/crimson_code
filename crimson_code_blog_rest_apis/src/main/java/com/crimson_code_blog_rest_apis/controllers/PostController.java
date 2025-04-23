@@ -1,0 +1,88 @@
+package com.crimson_code_blog_rest_apis.controllers;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.crimson_code_blog_rest_apis.dto.request.PostRequestModel;
+import com.crimson_code_blog_rest_apis.dto.response.OperationStatusResponse;
+import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.PostResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.UserResponseModel;
+import com.crimson_code_blog_rest_apis.security.UserPrincipal;
+import com.crimson_code_blog_rest_apis.services.PostService;
+import com.crimson_code_blog_rest_apis.utils.OperationName;
+import com.crimson_code_blog_rest_apis.utils.OperationStatus;
+
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping("/api/posts")
+public class PostController {
+
+	private PostService postService;
+
+	@Autowired
+	public PostController(PostService postService) {
+		this.postService = postService;
+	}
+	
+	@PostMapping
+	public ResponseEntity<PostResponseModel> createPost(
+			@Valid @RequestBody PostRequestModel postRequest) {
+		
+		return new ResponseEntity<>(postService.createPost(postRequest), HttpStatus.CREATED);
+	}
+	
+	@GetMapping("/{postId}")
+	public ResponseEntity<PostResponseModel> getPost(@PathVariable long postId) {
+		return new ResponseEntity<>(postService.getPost(postId), HttpStatus.OK);
+	}
+	
+	@GetMapping
+	public ResponseEntity<PageResponseModel<PostResponseModel>> getAllPosts(
+			@RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "15") int pageSize,
+			@RequestParam(name = "sort_by", defaultValue = "createdAt") String sortBy,
+			@RequestParam(name = "sort_dir", defaultValue = "asc") String sortDir
+			){
+		
+		return new ResponseEntity<>(postService.getAllPosts(page, pageSize, sortBy, sortDir), HttpStatus.OK);
+	}
+	
+	@PutMapping("/{postId}")
+	public ResponseEntity<PostResponseModel> updatePost(@PathVariable long postId,
+			@Valid @RequestBody PostRequestModel postRequest,
+			@AuthenticationPrincipal UserPrincipal userPrincipal) {
+		
+		return new ResponseEntity<>(postService.updatePost(postId, postRequest, userPrincipal), HttpStatus.OK);
+	}
+	
+	@DeleteMapping("/{postId}")
+	public ResponseEntity<OperationStatusResponse> updatePost(@PathVariable long postId,
+			@AuthenticationPrincipal UserPrincipal userPrincipal) {
+
+		OperationStatusResponse operationStatus = new OperationStatusResponse();
+		
+		postService.deletePost(postId, userPrincipal);
+		
+		operationStatus.setOperationName(OperationName.DELETE_POST.name());
+		
+		operationStatus.setOperationStatus(OperationStatus.SUCCESS.name());
+		
+		operationStatus.setMessage("The psot has been deleted successfully");
+		
+		return new ResponseEntity<>(operationStatus, HttpStatus.OK);
+	}
+}
