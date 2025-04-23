@@ -21,7 +21,7 @@ import com.crimson_code_blog_rest_apis.dto.request.PasswordResetRequestModel;
 import com.crimson_code_blog_rest_apis.dto.request.UpdateUserRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.OperationStatusResponse;
 import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
-import com.crimson_code_blog_rest_apis.dto.response.PostResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.PostSummaryResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.UserResponseModel;
 import com.crimson_code_blog_rest_apis.security.UserPrincipal;
 import com.crimson_code_blog_rest_apis.services.UserService;
@@ -141,7 +141,7 @@ public class UserController {
 	}
 	
 	@GetMapping("/{publicId}/posts")
-	public ResponseEntity<PageResponseModel<PostResponseModel>> getUserPosts(@PathVariable String publicId,
+	public ResponseEntity<PageResponseModel<PostSummaryResponseModel>> getUserPosts(@PathVariable String publicId,
 			@RequestParam(name = "page", defaultValue = "0") int page,
 			@RequestParam(name = "size", defaultValue = "15") int pageSize,
 			@RequestParam(name = "sort_by", defaultValue = "createdAt") String sortBy,

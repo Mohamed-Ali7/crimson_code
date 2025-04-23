@@ -1,5 +1,7 @@
 package com.crimson_code_blog_rest_apis.dto.request;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -17,6 +19,8 @@ public class PostRequestModel {
 	
 	@Positive(message = "Category id cannot be empty and must be greater than 0")
 	private long categoryId;
+	
+	private List<String> tags;
 	
 	public PostRequestModel() {
 		
@@ -51,4 +55,13 @@ public class PostRequestModel {
 	public void setCategoryId(long categoryId) {
 		this.categoryId = categoryId;
 	}
+
+	public List<String> getTags() {
+		return tags;
+	}
+
+	public void setTags(List<String> tags) {
+		this.tags = tags;
+	}
+	
 }

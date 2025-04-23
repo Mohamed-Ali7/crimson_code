@@ -63,6 +63,7 @@ public class SecurityConfig {
 					.requestMatchers(HttpMethod.GET, "/images/**").permitAll()
 					.requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
 					.requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+					.requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll()
 					
 					// matches /api/users/password-reset-request and /api/users/password-reset
 					.requestMatchers(HttpMethod.POST, "/api/users/*").permitAll()

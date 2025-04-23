@@ -1,6 +1,8 @@
 package com.crimson_code_blog_rest_apis.entity;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -10,6 +12,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
@@ -53,6 +57,16 @@ public class PostEntity {
 	})
 	@JoinColumn(name = "category_id")
 	private CategoryEntity category;
+	
+	@ManyToMany(fetch = FetchType.LAZY, cascade = {
+			CascadeType.PERSIST, CascadeType.DETACH,
+			CascadeType.MERGE, CascadeType.REFRESH
+	})
+	@JoinTable(name = "post_tags",
+	joinColumns = @JoinColumn(name = "post_id",  referencedColumnName = "id"),
+	inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id")
+	)
+	private List<TagEntity> tags;
 	
 	public PostEntity() {
 		
@@ -132,5 +146,21 @@ public class PostEntity {
 	public void setCategory(CategoryEntity category) {
 		this.category = category;
 	}
+
 	
+	public List<TagEntity> getTags() {
+		return tags;
+	}
+
+	public void setTags(List<TagEntity> tags) {
+		this.tags = tags;
+	}
+
+	public void addTag(TagEntity tag) {
+		if (this.tags == null) {
+			tags = new ArrayList<>();
+		}
+        tags.add(tag);
+        tag.addPost(this);
+    }
 }

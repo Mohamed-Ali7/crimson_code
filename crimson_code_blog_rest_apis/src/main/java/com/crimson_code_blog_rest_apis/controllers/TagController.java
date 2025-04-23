@@ -11,81 +11,80 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.crimson_code_blog_rest_apis.dto.request.CategoryRequestModel;
+import com.crimson_code_blog_rest_apis.dto.request.TagRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.CategoryResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.OperationStatusResponse;
 import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.PostSummaryResponseModel;
-import com.crimson_code_blog_rest_apis.services.CategoryService;
+import com.crimson_code_blog_rest_apis.dto.response.TagResponseModel;
+import com.crimson_code_blog_rest_apis.services.TagService;
 import com.crimson_code_blog_rest_apis.utils.OperationName;
 import com.crimson_code_blog_rest_apis.utils.OperationStatus;
 
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
-@RequestMapping("/api/categories")
-public class CategoryController {
+@RequestMapping("/api/tags")
+public class TagController {
 
-	private CategoryService categoryService;
-	
+	private TagService tagService;
+
 	@Autowired
-	public CategoryController(CategoryService categoryService) {
-		this.categoryService = categoryService;
-	}
-
-	@PreAuthorize("hasRole('ADMIN')")
-	@PostMapping
-	public ResponseEntity<CategoryResponseModel> createCategory(
-			@Valid @RequestBody CategoryRequestModel categoryRequest) {
-
-		return new ResponseEntity<>(categoryService.createCategory(categoryRequest), HttpStatus.CREATED);
+	public TagController(TagService tagService) {
+		this.tagService = tagService;
 	}
 	
-	@GetMapping("/{categoryId}")
-	public ResponseEntity<CategoryResponseModel> getCategory(@PathVariable long categoryId) {
-		return new ResponseEntity<>(categoryService.getCategory(categoryId), HttpStatus.OK);
+	@PostMapping
+	public ResponseEntity<TagResponseModel> createTag(@Valid @RequestBody TagRequestModel tagRequest) {
+		return new ResponseEntity<>(tagService.createTag(tagRequest), HttpStatus.CREATED);
+	}
+	
+	@GetMapping("/{tagId}")
+	public ResponseEntity<TagResponseModel> getTag(@PathVariable long tagId) {
+		return new ResponseEntity<>(tagService.getTag(tagId), HttpStatus.OK);
 	}
 	
 	@GetMapping
-	public ResponseEntity<PageResponseModel<CategoryResponseModel>> getAllCategories(
+	public ResponseEntity<PageResponseModel<TagResponseModel>> getAllTags(
 			@RequestParam(name = "page", defaultValue = "0") int page,
 			@RequestParam(name = "size", defaultValue = "15") int pageSize,
 			@RequestParam(name = "sort_by", defaultValue = "name") String sortBy,
 			@RequestParam(name = "sort_dir", defaultValue = "asc") String sortDir) {
-		
-		return new ResponseEntity<>(categoryService.getAllCategories(page, pageSize, sortBy, sortDir), HttpStatus.OK);
+		return new ResponseEntity<>(tagService.getAllTags(page, pageSize, sortBy, sortDir), HttpStatus.OK);
 	}
 	
 	@PreAuthorize("hasRole('ADMIN')")
-	@PutMapping("/{categoryId}")
-	public ResponseEntity<CategoryResponseModel> updateCategory(@PathVariable long categoryId,
-			@Valid @RequestBody CategoryRequestModel categoryRequest) {
+	@PutMapping("/{tagId}")
+	public ResponseEntity<TagResponseModel> updateTag(@PathVariable long tagId,
+			@Valid @RequestBody TagRequestModel tagRequest) {
 		
-		return new ResponseEntity<>(categoryService.updateCategory(categoryId, categoryRequest), HttpStatus.OK);
+		return new ResponseEntity<>(tagService.updateTag(tagId, tagRequest), HttpStatus.OK);
 	}
 	
 	@PreAuthorize("hasRole('ADMIN')")
-	@DeleteMapping("/{categoryId}")
-	public OperationStatusResponse deleteCategory(@PathVariable long categoryId) {
+	@DeleteMapping("/{tagId}")
+	public OperationStatusResponse deleteTag(@PathVariable long tagId) {
 		
 		OperationStatusResponse operationStatus = new OperationStatusResponse();
 		
-		categoryService.deleteCategory(categoryId);
+		tagService.deleteTag(tagId);
 		
-		operationStatus.setOperationName(OperationName.DELETE_CATEGORY.name());
+		operationStatus.setOperationName(OperationName.DELETE_TAG.name());
 		
 		operationStatus.setOperationStatus(OperationStatus.SUCCESS.name());
 		
-		operationStatus.setMessage("The category has been deleted successfully");
+		operationStatus.setMessage("The tag has been deleted successfully");
 		
 		return operationStatus;
 	}
 	
-	@GetMapping("/{categoryId}/posts")
-	public ResponseEntity<PageResponseModel<PostSummaryResponseModel>> getCategoryPosts(@PathVariable long categoryId,
+	@GetMapping("/{tagId}/posts")
+	public ResponseEntity<PageResponseModel<PostSummaryResponseModel>> getTagPosts(@PathVariable long tagId,
 			@RequestParam(name = "page", defaultValue = "0") int page,
 			@RequestParam(name = "size", defaultValue = "15") int pageSize,
 			@RequestParam(name = "sort_by", defaultValue = "createdAt") String sortBy,
@@ -93,7 +92,7 @@ public class CategoryController {
 			){
 		
 		return new ResponseEntity<>(
-				categoryService.getCategoryPosts(categoryId, page, pageSize, sortBy, sortDir), HttpStatus.OK
-				);
+				tagService.getTagPosts(tagId, page, pageSize, sortBy, sortDir), HttpStatus.OK);
 	}
+	
 }

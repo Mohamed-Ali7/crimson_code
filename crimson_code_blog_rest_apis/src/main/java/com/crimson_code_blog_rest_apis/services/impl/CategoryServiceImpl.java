@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import com.crimson_code_blog_rest_apis.dto.request.CategoryRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.CategoryResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
-import com.crimson_code_blog_rest_apis.dto.response.PostResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.PostSummaryResponseModel;
 import com.crimson_code_blog_rest_apis.entity.CategoryEntity;
 import com.crimson_code_blog_rest_apis.entity.PostEntity;
 import com.crimson_code_blog_rest_apis.entity.UserEntity;
@@ -127,7 +127,7 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
-	public PageResponseModel<PostResponseModel> getCategoryPosts(long categoryId, int page, int pageSize, String sortBy,
+	public PageResponseModel<PostSummaryResponseModel> getCategoryPosts(long categoryId, int page, int pageSize, String sortBy,
 			String sortDir) {
 
 		CategoryEntity categoryEntity = categoryRepository.findById(categoryId)
@@ -143,10 +143,11 @@ public class CategoryServiceImpl implements CategoryService {
 		
 		List<PostEntity> categoryPosts = categoryPostsPage.getContent();
 		
-		List<PostResponseModel> categoryPostsResponse = categoryPosts.stream()
-				.map(post -> PostServiceImpl.mapToPostResponse(post)).collect(Collectors.toList());
+		List<PostSummaryResponseModel> categoryPostsResponse = categoryPosts.stream()
+				.map(post -> PostServiceImpl.mapToPostResponse(new PostSummaryResponseModel(), post))
+				.collect(Collectors.toList());
 		
-		PageResponseModel<PostResponseModel> pageResponse = new PageResponseModel<>();
+		PageResponseModel<PostSummaryResponseModel> pageResponse = new PageResponseModel<>();
 		
 		pageResponse.setContent(categoryPostsResponse);
 		pageResponse.setPageNumber(++page);
