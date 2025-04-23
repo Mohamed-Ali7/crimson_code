@@ -147,6 +147,15 @@ public class PostEntity {
 		this.category = category;
 	}
 
+	
+	public List<TagEntity> getTags() {
+		return tags;
+	}
+
+	public void setTags(List<TagEntity> tags) {
+		this.tags = tags;
+	}
+
 	public void addTag(TagEntity tag) {
 		if (this.tags == null) {
 			tags = new ArrayList<>();

@@ -2,7 +2,7 @@ package com.crimson_code_blog_rest_apis.services;
 
 import com.crimson_code_blog_rest_apis.dto.request.TagRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
-import com.crimson_code_blog_rest_apis.dto.response.PostResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.PostSummaryResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.TagResponseModel;
 
 public interface TagService {
@@ -12,6 +12,6 @@ public interface TagService {
 	PageResponseModel<TagResponseModel> getAllTags(int page, int pageSize, String sortBy, String sortDir);
 	TagResponseModel updateTag(long tagId, TagRequestModel tagRequest);
 	void deleteTag(long id);
-	PageResponseModel<PostResponseModel> getTagPosts(long tagId, int page, int pageSize,
+	PageResponseModel<PostSummaryResponseModel> getTagPosts(long tagId, int page, int pageSize,
 			String sortBy, String sortDir);
 }

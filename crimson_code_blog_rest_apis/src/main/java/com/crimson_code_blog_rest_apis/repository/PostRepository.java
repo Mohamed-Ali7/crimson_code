@@ -3,6 +3,8 @@ package com.crimson_code_blog_rest_apis.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.crimson_code_blog_rest_apis.entity.PostEntity;
 
@@ -10,4 +12,7 @@ public interface PostRepository extends JpaRepository<PostEntity, Long> {
 
 	Page<PostEntity> findAllByUserId(long userId, Pageable pageable);
 	Page<PostEntity> findAllByCategoryId(long categoryId, Pageable pageable);
+	
+	//@Query("SELECT post FROM PostEntity post JOIN post.tags tag WHERE tag.id = :tagId") // using JPQL Query
+	Page<PostEntity> findByTags_Id(long tagId, Pageable pageable);
 }

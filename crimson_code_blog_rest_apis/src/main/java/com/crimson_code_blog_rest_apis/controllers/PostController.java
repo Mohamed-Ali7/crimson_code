@@ -18,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.crimson_code_blog_rest_apis.dto.request.PostRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.OperationStatusResponse;
 import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
-import com.crimson_code_blog_rest_apis.dto.response.PostResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.PostDetailResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.PostSummaryResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.UserResponseModel;
 import com.crimson_code_blog_rest_apis.security.UserPrincipal;
 import com.crimson_code_blog_rest_apis.services.PostService;
@@ -39,19 +40,19 @@ public class PostController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<PostResponseModel> createPost(
+	public ResponseEntity<PostDetailResponseModel> createPost(
 			@Valid @RequestBody PostRequestModel postRequest) {
 		
 		return new ResponseEntity<>(postService.createPost(postRequest), HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/{postId}")
-	public ResponseEntity<PostResponseModel> getPost(@PathVariable long postId) {
+	public ResponseEntity<PostDetailResponseModel> getPost(@PathVariable long postId) {
 		return new ResponseEntity<>(postService.getPost(postId), HttpStatus.OK);
 	}
 	
 	@GetMapping
-	public ResponseEntity<PageResponseModel<PostResponseModel>> getAllPosts(
+	public ResponseEntity<PageResponseModel<PostSummaryResponseModel>> getAllPosts(
 			@RequestParam(name = "page", defaultValue = "0") int page,
 			@RequestParam(name = "size", defaultValue = "15") int pageSize,
 			@RequestParam(name = "sort_by", defaultValue = "createdAt") String sortBy,
@@ -62,7 +63,7 @@ public class PostController {
 	}
 	
 	@PutMapping("/{postId}")
-	public ResponseEntity<PostResponseModel> updatePost(@PathVariable long postId,
+	public ResponseEntity<PostDetailResponseModel> updatePost(@PathVariable long postId,
 			@Valid @RequestBody PostRequestModel postRequest,
 			@AuthenticationPrincipal UserPrincipal userPrincipal) {
 		
