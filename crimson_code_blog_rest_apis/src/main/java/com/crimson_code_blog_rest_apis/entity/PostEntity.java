@@ -15,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -68,6 +69,9 @@ public class PostEntity {
 	)
 	private List<TagEntity> tags;
 	
+	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private List<CommentEntity> comments;
+
 	public PostEntity() {
 		
 	}
@@ -163,4 +167,13 @@ public class PostEntity {
         tags.add(tag);
         tag.addPost(this);
     }
+
+	public List<CommentEntity> getComments() {
+		return comments;
+	}
+
+	public void setComments(List<CommentEntity> comments) {
+		this.comments = comments;
+	}
+	
 }
