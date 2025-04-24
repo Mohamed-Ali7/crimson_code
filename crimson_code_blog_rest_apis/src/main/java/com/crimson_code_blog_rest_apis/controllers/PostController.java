@@ -82,7 +82,7 @@ public class PostController {
 		
 		operationStatus.setOperationStatus(OperationStatus.SUCCESS.name());
 		
-		operationStatus.setMessage("The psot has been deleted successfully");
+		operationStatus.setMessage("The post has been deleted successfully");
 		
 		return new ResponseEntity<>(operationStatus, HttpStatus.OK);
 	}
