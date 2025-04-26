@@ -2,8 +2,8 @@ package com.crimson_code_blog_rest_apis.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,14 +13,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.crimson_code_blog_rest_apis.dto.request.PostRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.OperationStatusResponse;
 import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.PostDetailResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.PostSummaryResponseModel;
-import com.crimson_code_blog_rest_apis.dto.response.UserResponseModel;
 import com.crimson_code_blog_rest_apis.security.UserPrincipal;
 import com.crimson_code_blog_rest_apis.services.PostService;
 import com.crimson_code_blog_rest_apis.utils.OperationName;
@@ -39,11 +40,20 @@ public class PostController {
 		this.postService = postService;
 	}
 	
-	@PostMapping
+	/*
+	 * This request accept multipart/form-data media type because the request sends
+	 * JSON body which is the post data and at the same time it sends
+	 * a file which is the post image of the post
+	 * 
+	 * Note that the client has to explicitly provide the content type of the post input as application/json
+	 */
+	
+	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
 	public ResponseEntity<PostDetailResponseModel> createPost(
-			@Valid @RequestBody PostRequestModel postRequest) {
+			@Valid @RequestPart("post") PostRequestModel postRequest,
+			@RequestPart(value = "postImage", required = false) MultipartFile postImage) {
 		
-		return new ResponseEntity<>(postService.createPost(postRequest), HttpStatus.CREATED);
+		return new ResponseEntity<>(postService.createPost(postRequest, postImage), HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/{postId}")

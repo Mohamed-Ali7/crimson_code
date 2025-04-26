@@ -1,12 +1,13 @@
 package com.crimson_code_blog_rest_apis.services.impl;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +17,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.crimson_code_blog_rest_apis.dto.request.PostRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
@@ -54,7 +56,7 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public PostDetailResponseModel createPost(PostRequestModel postRequest) {
+	public PostDetailResponseModel createPost(PostRequestModel postRequest, MultipartFile postImage) {
 		
 		String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 		
@@ -77,15 +79,34 @@ public class PostServiceImpl implements PostService {
 		newPost.setUser(userEntity);
 		newPost.setCategory(categoryEntity);
 		
-		postRequest.getTags().forEach(tag -> {
-			TagEntity tagEntity = tagRepository.findByName(tag)
-					.orElseGet(() -> tagRepository.save(new TagEntity(tag)));
-			newPost.addTag(tagEntity);
-		});
+		// Saving post image
+		if (postImage != null && !postImage.isEmpty()) {
+			String fileName = UUID.randomUUID().toString() + "_" + postImage.getOriginalFilename();
+			AuthServiceImpl.saveImage(postImage, fileName, "post_image/");
+			String imageUrl = "/images/post_image/" + fileName;
+			newPost.setImageUrl(imageUrl);
+		}
+		
+		if (postRequest.getTags() != null) {
+			postRequest.getTags().forEach(tag -> {
+				TagEntity tagEntity = tagRepository.findByName(tag)
+						.orElseGet(() -> tagRepository.save(new TagEntity(tag)));
+				newPost.addTag(tagEntity);
+			});
+		}
 		
 		PostEntity savedPost = postRepository.save(newPost);
 		
 		PostDetailResponseModel postResponse = mapToPostResponse(new PostDetailResponseModel(), savedPost);
+		
+		if (savedPost.getTags() != null) {
+			List<TagResponseModel> tagsResponse = savedPost.getTags().stream()
+					.map(tag -> new TagResponseModel(tag.getId(), tag.getName())).collect(Collectors.toList());
+			postResponse.setTags(tagsResponse);
+		} else {
+			postResponse.setTags(Collections.emptyList());
+		}
+		
 		
 		return postResponse;
 	}
@@ -186,6 +207,7 @@ public class PostServiceImpl implements PostService {
 		postResponse.setId(postEntity.getId());
 		postResponse.setTitle(postEntity.getTitle());
 		postResponse.setContent(postEntity.getContent());
+		postResponse.setImageUrl(postEntity.getImageUrl());
 		postResponse.setUserPublicId(postEntity.getUserPublicId());
 		postResponse.setCreatedAt(postEntity.getCreatedAt());
 		postResponse.setUpdatedAt(postEntity.getUpdatedAt());

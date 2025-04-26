@@ -10,7 +10,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,7 +100,9 @@ public class AuthServiceImpl implements AuthService {
 		newUser.setJoinedAt(OffsetDateTime.now(ZoneOffset.UTC));
 		
 		if (profilePicture != null && !profilePicture.isEmpty()) {
-			String profileImageUrl = saveUserProfileImage(profilePicture, newUser.getPublicId());
+			String fileName = newUser.getPublicId() + "_" + profilePicture.getOriginalFilename();
+			saveImage(profilePicture, fileName, "profile_pictures/");
+			String profileImageUrl = "/images/profile_pictures/" + fileName;
 			newUser.setProfileImgUrl(profileImageUrl);
 		}
 
@@ -241,9 +242,8 @@ public class AuthServiceImpl implements AuthService {
 		
 	}
 	
-	private String saveUserProfileImage(MultipartFile file, String publicUserId) {
-		String fileName = publicUserId + "_" + file.getOriginalFilename();
-		Path uploadPath = Paths.get("uploads/profile_pictures/" + fileName);
+	protected static void saveImage(MultipartFile file, String fileName, String uploadDir) {
+		Path uploadPath = Paths.get("uploads/" + uploadDir + fileName);
 	
 		if (!List.of("image/jpeg", "image/png", "image/webp").contains(file.getContentType()))  {
 			throw new CrimsonCodeGlobalException("Invalid content type.");
@@ -257,10 +257,8 @@ public class AuthServiceImpl implements AuthService {
 			
 			Files.copy(file.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
 			
-			return "/images/" + fileName;
-			
 		} catch (IOException e) {
-			throw new CrimsonCodeGlobalException("Failed to store user's profile picture");
+			throw new CrimsonCodeGlobalException("Failed to store the picture");
 		}
 		
 	}

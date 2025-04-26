@@ -6,6 +6,7 @@ public class PostResponse {
 	private long id;
 	private String title;
 	private String content;
+	private String imageUrl;
 	private long categoryId;
 	private String userPublicId;
 	private OffsetDateTime createdAt;
@@ -15,11 +16,12 @@ public class PostResponse {
 		
 	}
 
-	public PostResponse(long id, String title, String content, long categoryId, String userPublicId,
+	public PostResponse(long id, String title, String content, String imageUrl, long categoryId, String userPublicId,
 			OffsetDateTime createdAt, OffsetDateTime updatedAt) {
 		this.id = id;
 		this.title = title;
 		this.content = content;
+		this.imageUrl = imageUrl;
 		this.userPublicId = userPublicId;
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
@@ -47,6 +49,14 @@ public class PostResponse {
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
 	}
 
 	public long getCategoryId() {

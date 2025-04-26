@@ -11,10 +11,10 @@ public class PostDetailResponseModel extends PostResponse{
 
 	}
 
-	public PostDetailResponseModel(long id, String title, String content, long categoryId, String userPublicId,
-			OffsetDateTime createdAt, OffsetDateTime updatedAt, List<TagResponseModel> tags) {
+	public PostDetailResponseModel(long id, String title, String content, String imageUrl, long categoryId,
+			String userPublicId, OffsetDateTime createdAt, OffsetDateTime updatedAt, List<TagResponseModel> tags) {
 
-		super(id, title,content, categoryId, userPublicId, createdAt, updatedAt);
+		super(id, title,content, imageUrl, categoryId, userPublicId, createdAt, updatedAt);
 		this.tags = tags;
 	}
 

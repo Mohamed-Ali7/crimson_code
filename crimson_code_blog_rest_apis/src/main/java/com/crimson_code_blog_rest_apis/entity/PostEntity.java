@@ -32,6 +32,9 @@ public class PostEntity {
 	@Column(name = "content", nullable = false, columnDefinition = "text")
 	private String content;
 	
+	@Column(name = "image_url")
+	private String imageUrl;
+	
 	@Column(name = "user_public_id")
 	private String userPublicId;
 	
@@ -76,10 +79,11 @@ public class PostEntity {
 		
 	}
 
-	public PostEntity(String title, String content, String userPublicId, OffsetDateTime createdAt,
+	public PostEntity(String title, String content, String imageUrl, String userPublicId, OffsetDateTime createdAt,
 			OffsetDateTime updatedAt, UserEntity user, CategoryEntity category) {
 		this.title = title;
 		this.content = content;
+		this.imageUrl = imageUrl;
 		this.userPublicId = userPublicId;
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
@@ -109,6 +113,14 @@ public class PostEntity {
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
 	}
 
 	public String getUserPublicId() {
