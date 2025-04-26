@@ -52,8 +52,9 @@ public class UserEntity {
 	private boolean isEmailVerified = false;
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = {
-			CascadeType.PERSIST, CascadeType.DETACH,
-			CascadeType.MERGE, CascadeType.REFRESH
+			CascadeType.DETACH,
+			CascadeType.MERGE,
+			CascadeType.REFRESH
 	})
 	@JoinTable(name = "users_roles",
 	joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), 

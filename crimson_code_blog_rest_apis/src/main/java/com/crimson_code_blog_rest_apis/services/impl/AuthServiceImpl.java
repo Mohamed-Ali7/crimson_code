@@ -75,7 +75,6 @@ public class AuthServiceImpl implements AuthService {
 		this.tokenBlacklistRepository = tokenBlacklistRepository;
 	}
 
-
 	@Override
 	public UserResponseModel register(RegisterRequestModel registerRequest, MultipartFile profilePicture) {
 		if(userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
@@ -87,10 +86,9 @@ public class AuthServiceImpl implements AuthService {
 		newUser.setPublicId(UUID.randomUUID().toString());
 		
 		RoleEntity userRole = roleRepository.findByName(UserRoles.ROLE_USER.name())
-				.orElseGet(() -> {
-					RoleEntity newUserRole = new RoleEntity(UserRoles.ROLE_USER.name());
-					return roleRepository.save(newUserRole);
-				});
+				.orElseThrow(() -> new IllegalStateException(
+						"Required role 'ROLE_USER' not found. Server misconfiguration detected.")
+						);
 		
 		String emailVerificationToken = jwtUtils.generateEmailVerificationToken(newUser.getEmail());
 		newUser.setEmailVerificationToken(emailVerificationToken);
