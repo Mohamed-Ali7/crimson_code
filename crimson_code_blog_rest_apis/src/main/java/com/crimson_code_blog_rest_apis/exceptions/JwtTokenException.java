@@ -1,7 +1,5 @@
 package com.crimson_code_blog_rest_apis.exceptions;
 
-import org.springframework.http.HttpStatus;
-
 import com.crimson_code_blog_rest_apis.utils.JwtTokenType;
 
 public class JwtTokenException extends RuntimeException {

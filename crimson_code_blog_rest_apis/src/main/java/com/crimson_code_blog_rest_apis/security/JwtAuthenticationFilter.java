@@ -11,13 +11,11 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import com.crimson_code_blog_rest_apis.utils.JwtTokenType;
 import com.crimson_code_blog_rest_apis.utils.JwtUtils;
 
-import io.jsonwebtoken.lang.Arrays;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

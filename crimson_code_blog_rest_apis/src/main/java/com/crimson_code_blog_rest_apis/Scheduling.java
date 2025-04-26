@@ -5,19 +5,19 @@ import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
+import org.springframework.scheduling.annotation.EnableScheduling;
 import com.crimson_code_blog_rest_apis.repository.TokenBlacklistRepository;
 
 import jakarta.transaction.Transactional;
 
 @Service
-@org.springframework.scheduling.annotation.EnableScheduling
-public class EnableScheduling {
+@EnableScheduling
+public class Scheduling {
 
 	private TokenBlacklistRepository tokenBlacklistRepository;
 
 	@Autowired
-	public EnableScheduling(TokenBlacklistRepository tokenBlacklistRepository) {
+	public Scheduling(TokenBlacklistRepository tokenBlacklistRepository) {
 		this.tokenBlacklistRepository = tokenBlacklistRepository;
 	}
 

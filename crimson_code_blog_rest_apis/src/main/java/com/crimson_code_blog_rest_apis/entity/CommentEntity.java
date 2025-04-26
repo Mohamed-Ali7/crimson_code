@@ -2,7 +2,6 @@ package com.crimson_code_blog_rest_apis.entity;
 
 import java.time.OffsetDateTime;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

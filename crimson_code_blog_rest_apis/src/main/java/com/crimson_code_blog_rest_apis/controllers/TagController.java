@@ -13,9 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.crimson_code_blog_rest_apis.dto.request.CategoryRequestModel;
 import com.crimson_code_blog_rest_apis.dto.request.TagRequestModel;
-import com.crimson_code_blog_rest_apis.dto.response.CategoryResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.OperationStatusResponse;
 import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.PostSummaryResponseModel;

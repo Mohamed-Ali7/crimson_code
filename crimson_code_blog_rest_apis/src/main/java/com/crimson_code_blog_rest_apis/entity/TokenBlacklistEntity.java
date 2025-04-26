@@ -1,7 +1,6 @@
 package com.crimson_code_blog_rest_apis.entity;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

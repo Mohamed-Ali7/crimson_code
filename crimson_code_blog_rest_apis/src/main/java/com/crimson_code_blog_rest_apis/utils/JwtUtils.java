@@ -1,6 +1,5 @@
 package com.crimson_code_blog_rest_apis.utils;
 
-import java.security.Key;
 import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
@@ -9,12 +8,10 @@ import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.crimson_code_blog_rest_apis.exceptions.JwtTokenException;
 import com.crimson_code_blog_rest_apis.repository.TokenBlacklistRepository;
-import com.crimson_code_blog_rest_apis.exceptions.CrimsonCodeGlobalException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

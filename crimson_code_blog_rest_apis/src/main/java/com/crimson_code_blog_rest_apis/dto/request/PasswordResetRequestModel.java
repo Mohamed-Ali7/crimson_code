@@ -2,7 +2,6 @@ package com.crimson_code_blog_rest_apis.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 public class PasswordResetRequestModel {
 	

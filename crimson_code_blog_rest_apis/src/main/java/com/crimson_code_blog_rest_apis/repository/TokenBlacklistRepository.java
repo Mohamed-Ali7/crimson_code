@@ -1,7 +1,6 @@
 package com.crimson_code_blog_rest_apis.repository;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

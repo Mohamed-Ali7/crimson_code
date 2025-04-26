@@ -9,8 +9,6 @@ import com.crimson_code_blog_rest_apis.dto.response.PostSummaryResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.UserResponseModel;
 import com.crimson_code_blog_rest_apis.security.UserPrincipal;
 
-import jakarta.validation.Valid;
-
 public interface UserService {
 
 	UserResponseModel getCurrentUser(UserPrincipal userPrincipal);

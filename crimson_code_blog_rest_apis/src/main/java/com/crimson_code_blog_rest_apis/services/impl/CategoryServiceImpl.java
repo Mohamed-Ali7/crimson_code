@@ -20,7 +20,6 @@ import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.PostSummaryResponseModel;
 import com.crimson_code_blog_rest_apis.entity.CategoryEntity;
 import com.crimson_code_blog_rest_apis.entity.PostEntity;
-import com.crimson_code_blog_rest_apis.entity.UserEntity;
 import com.crimson_code_blog_rest_apis.exceptions.CrimsonCodeGlobalException;
 import com.crimson_code_blog_rest_apis.exceptions.ResourceNotFoundException;
 import com.crimson_code_blog_rest_apis.repository.CategoryRepository;

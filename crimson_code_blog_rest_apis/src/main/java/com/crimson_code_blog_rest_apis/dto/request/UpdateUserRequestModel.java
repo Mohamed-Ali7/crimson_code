@@ -1,7 +1,6 @@
 package com.crimson_code_blog_rest_apis.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class UpdateUserRequestModel {
