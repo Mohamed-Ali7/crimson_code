@@ -35,6 +35,7 @@ import com.crimson_code_blog_rest_apis.repository.TagRepository;
 import com.crimson_code_blog_rest_apis.repository.UserRepository;
 import com.crimson_code_blog_rest_apis.security.UserPrincipal;
 import com.crimson_code_blog_rest_apis.services.PostService;
+import com.crimson_code_blog_rest_apis.utils.GlobalUtils;
 import com.crimson_code_blog_rest_apis.utils.UserRoles;
 
 @Service
@@ -81,7 +82,7 @@ public class PostServiceImpl implements PostService {
 		// Saving post image
 		if (postImage != null && !postImage.isEmpty()) {
 			String fileName = UUID.randomUUID().toString() + "_" + postImage.getOriginalFilename();
-			AuthServiceImpl.saveImage(postImage, fileName, "post_image/");
+			GlobalUtils.saveImage(postImage, fileName, "post_image/");
 			String imageUrl = "/images/post_image/" + fileName;
 			newPost.setImageUrl(imageUrl);
 		}

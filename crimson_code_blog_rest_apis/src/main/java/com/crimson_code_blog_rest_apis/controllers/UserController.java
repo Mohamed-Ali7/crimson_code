@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.crimson_code_blog_rest_apis.dto.request.ChangePasswordRequestModel;
 import com.crimson_code_blog_rest_apis.dto.request.PasswordResetConfirmationRequest;
@@ -39,6 +40,23 @@ public class UserController {
 	@Autowired
 	public UserController(UserService userService) {
 		this.userService = userService;
+	}
+	
+	@PutMapping("/me/profile-picture")
+	public ResponseEntity<OperationStatusResponse> updateProfilePicture(
+			@RequestParam("profilePicture") MultipartFile profilePicture) {
+		
+		OperationStatusResponse operationStatus = new OperationStatusResponse();
+		
+		userService.updateProfilePicture(profilePicture);
+		
+		operationStatus.setOperationName(OperationName.UPDATE_PROFILE_PICTURE.name());
+		
+		operationStatus.setOperationStatus(OperationStatus.SUCCESS.name());
+		
+		operationStatus.setMessage("Your profile picture has been successfully updated.");
+		
+		return new ResponseEntity<>(operationStatus, HttpStatus.OK);
 	}
 	
 	@GetMapping("/me")

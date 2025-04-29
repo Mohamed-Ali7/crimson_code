@@ -1,5 +1,7 @@
 package com.crimson_code_blog_rest_apis.services;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.crimson_code_blog_rest_apis.dto.request.ChangePasswordRequestModel;
 import com.crimson_code_blog_rest_apis.dto.request.PasswordResetConfirmationRequest;
 import com.crimson_code_blog_rest_apis.dto.request.PasswordResetRequestModel;
@@ -11,6 +13,7 @@ import com.crimson_code_blog_rest_apis.security.UserPrincipal;
 
 public interface UserService {
 
+	void updateProfilePicture(MultipartFile profilePicture);
 	UserResponseModel getCurrentUser(UserPrincipal userPrincipal);
 	UserResponseModel getUser(String publicId);
 	PageResponseModel<UserResponseModel> getAllUser(int page, int size, String sortBy, String sortDir);

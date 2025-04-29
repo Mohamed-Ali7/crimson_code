@@ -76,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public UserResponseModel register(RegisterRequestModel registerRequest, MultipartFile profilePicture) {
+	public UserResponseModel register(RegisterRequestModel registerRequest) {
 		if(userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
 			throw new CrimsonCodeGlobalException("This email already exists");
 		}
@@ -96,14 +96,6 @@ public class AuthServiceImpl implements AuthService {
 		newUser.addRole(userRole);
 		newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
 		newUser.setJoinedAt(OffsetDateTime.now(ZoneOffset.UTC));
-		
-		if (profilePicture != null && !profilePicture.isEmpty()) {
-			String fileName = newUser.getPublicId() + "_" + profilePicture.getOriginalFilename();
-			saveImage(profilePicture, fileName, "profile_pictures/");
-			String profileImageUrl = "/images/profile_pictures/" + fileName;
-			newUser.setProfileImgUrl(profileImageUrl);
-		}
-
 		UserEntity savedUser = userRepository.save(newUser);
 		
 		UserResponseModel registerResponse = modelMapper.map(savedUser, UserResponseModel.class);
@@ -240,24 +232,4 @@ public class AuthServiceImpl implements AuthService {
 		
 	}
 	
-	protected static void saveImage(MultipartFile file, String fileName, String uploadDir) {
-		Path uploadPath = Paths.get("uploads/" + uploadDir + fileName);
-	
-		if (!List.of("image/jpeg", "image/png", "image/webp").contains(file.getContentType()))  {
-			throw new CrimsonCodeGlobalException("Invalid content type.");
-		}
-
-		try {
-			
-			if (!Files.exists(uploadPath)) {
-				Files.createDirectories(uploadPath);
-			}
-			
-			Files.copy(file.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
-			
-		} catch (IOException e) {
-			throw new CrimsonCodeGlobalException("Failed to store the picture");
-		}
-		
-	}
 }

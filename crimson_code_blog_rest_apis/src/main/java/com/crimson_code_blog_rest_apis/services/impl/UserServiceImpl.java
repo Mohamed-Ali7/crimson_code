@@ -12,8 +12,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.crimson_code_blog_rest_apis.dto.request.ChangePasswordRequestModel;
 import com.crimson_code_blog_rest_apis.dto.request.PasswordResetConfirmationRequest;
@@ -34,6 +36,7 @@ import com.crimson_code_blog_rest_apis.repository.UserRepository;
 import com.crimson_code_blog_rest_apis.security.UserPrincipal;
 import com.crimson_code_blog_rest_apis.services.EmailService;
 import com.crimson_code_blog_rest_apis.services.UserService;
+import com.crimson_code_blog_rest_apis.utils.GlobalUtils;
 import com.crimson_code_blog_rest_apis.utils.JwtTokenType;
 import com.crimson_code_blog_rest_apis.utils.JwtUtils;
 
@@ -62,6 +65,24 @@ public class UserServiceImpl implements UserService {
 		this.postRepository = postRepository;
 	}
 
+	@Override
+	public void updateProfilePicture(MultipartFile profilePicture) {
+
+		String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+		
+		UserEntity user = userRepository.findByEmail(userEmail)
+				.orElseThrow(() -> new ResourceNotFoundException("User does not exist with email: " + userEmail));
+	
+		if (profilePicture != null && !profilePicture.isEmpty()) {
+			String fileName = user.getPublicId() + "_" + profilePicture.getOriginalFilename();
+			GlobalUtils.saveImage(profilePicture, fileName, "profile_pictures/");
+			String profileImageUrl = "/images/profile_pictures/" + fileName;
+			user.setProfileImgUrl(profileImageUrl);
+		}
+		userRepository.save(user);
+		
+	}
+	
 	@Override
 	public UserResponseModel getCurrentUser(UserPrincipal userPrincipal) {
 		if (userPrincipal == null || userPrincipal.getUserEntity() == null) {
@@ -257,5 +278,5 @@ public class UserServiceImpl implements UserService {
 		
 		return pageResponse;
 	}
-
+	
 }

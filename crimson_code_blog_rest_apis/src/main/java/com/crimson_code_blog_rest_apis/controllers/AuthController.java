@@ -40,19 +40,10 @@ public class AuthController {
 		this.authService = authService;
 	}
 	
-	/*
-	 * This request accept multipart/form-data media type because we are sending
-	 * JSON body which is the registered user data and at the same time we are sending
-	 * a file which is the profile image of the user
-	 * 
-	 * Note that the client has to explicitly provide the content type of the user input as application/json
-	 */
-
-	@PostMapping(value = "/register", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-	ResponseEntity<UserResponseModel> register(@Valid @RequestPart("user") RegisterRequestModel registerRequest,
-			@RequestPart("profilePicture") MultipartFile profilePicture) {
+	@PostMapping("/register")
+	ResponseEntity<UserResponseModel> register(@Valid @RequestBody RegisterRequestModel registerRequest) {
 		
-		return new ResponseEntity<>(authService.register(registerRequest, profilePicture), HttpStatus.CREATED);
+		return new ResponseEntity<>(authService.register(registerRequest), HttpStatus.CREATED);
 	}
 	
 	@PostMapping("/login")
