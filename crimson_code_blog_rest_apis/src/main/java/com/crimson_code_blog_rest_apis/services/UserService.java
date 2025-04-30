@@ -20,6 +20,7 @@ public interface UserService {
 	UserResponseModel updateUser(String publicId, UpdateUserRequestModel updateRequest);
 	void deleteUser(String publicId);
 	void passwordResetRequest(PasswordResetRequestModel passwordResetRequest);
+	void validatePasswordResetToken(String token);
 	void resetPassword(PasswordResetConfirmationRequest passwordResetConfirmation);
 	void changePassword(UserPrincipal userPrincipal, ChangePasswordRequestModel changePasswordRequest);
 	PageResponseModel<PostSummaryResponseModel> getUserPosts(String publicId, int page, int pageSize,

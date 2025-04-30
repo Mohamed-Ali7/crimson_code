@@ -106,7 +106,7 @@ public class UserController {
 		return operationStatus;
 	}
 	
-	@PostMapping("/password-reset-request")
+	@PostMapping("/password-reset/request")
 	public ResponseEntity<OperationStatusResponse> passwordResetRequest(
 			@Valid @RequestBody PasswordResetRequestModel passwordResetRequest) {
 
@@ -123,7 +123,23 @@ public class UserController {
 		return new ResponseEntity<>(operationStatus, HttpStatus.OK);
 	}
 	
-	@PostMapping("/password-reset")
+	@PostMapping("/password-reset/validate")
+	public ResponseEntity<OperationStatusResponse> validatePasswordResetToken(@RequestParam() String token) {
+
+		OperationStatusResponse operationStatus = new OperationStatusResponse();
+		
+		userService.validatePasswordResetToken(token);
+		
+		operationStatus.setOperationName(OperationName.PASSWORD_RESET_TOKEN_VALIDATION.name());
+		
+		operationStatus.setOperationStatus(OperationStatus.SUCCESS.name());
+		
+		operationStatus.setMessage("Password reset token has been verified successfully");
+		
+		return new ResponseEntity<>(operationStatus, HttpStatus.OK);
+	}
+	
+	@PostMapping("/password-reset/confirm")
 	public ResponseEntity<OperationStatusResponse> passwordResetConfirmation(
 			@Valid @RequestBody PasswordResetConfirmationRequest passwordResetConfirmation) {
 
