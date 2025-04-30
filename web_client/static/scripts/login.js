@@ -13,7 +13,7 @@ $(document).ready(function () {
 
   function isEmailValid(email) {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.trim().length === 0) {
+    if (!re.test(email.trim())) {
       return false;
     }
     return true;
