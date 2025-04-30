@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Verification</title>
+
+
+  <link rel="stylesheet" href="../static/styles/verify_email.css" />
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Roboto&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+</head>
+
+<body>
+
+  <header class="navbar">
+    <div class="logo">
+      <img src="../static/images/crimson_code_logo.png">
+    </div>
+    <div class="home-btn">
+      <i class="fas fa-home"></i>
+      <span>Home</span>
+    </div>
+  </header>
+  <main class="verify-email-wrapper">
+      <div class="message-container">
+        <div class="verify-failure">
+          <i class="bi bi-x-circle-fill icon-failure"></i>
+          <p>Verification failed. Please try to send a new verification email or contact support.</p>
+        </div>
+      </div>
+      <button class="send-verification-mail-btn">send a verification mail</button>
+  </main>
+</body>
+<script src="../static/scripts/verify_email.js"></script>
+
+</html>
