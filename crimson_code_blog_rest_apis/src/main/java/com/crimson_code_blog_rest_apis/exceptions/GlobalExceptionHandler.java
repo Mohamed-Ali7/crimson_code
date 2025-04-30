@@ -62,8 +62,8 @@ public class GlobalExceptionHandler {
 		String message = "Account disabled due to unverified email address, please verifiy your email first";
 		
 		ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(),
-				HttpStatus.UNAUTHORIZED.value(), message, request.getRequestURI());
-		return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+				HttpStatus.FORBIDDEN.value(), message, request.getRequestURI());
+		return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
 	}
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
