@@ -191,6 +191,17 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public void validatePasswordResetToken(String token) {
+		
+		jwtUtils.validateJwtToken(token, JwtTokenType.PASSWORD_RESET_TOKEN);
+		
+		boolean isValid = passwordResetTokenRepository.findByToken(token).isPresent();
+	    if (!isValid) {
+	        throw new JwtTokenException(JwtTokenType.PASSWORD_RESET_TOKEN, "Invalid or expired password reset token");
+	    }
+	}
+	
+	@Override
 	public void resetPassword(PasswordResetConfirmationRequest passwordResetConfirmation) {
 
 		String passwordResetToken = passwordResetConfirmation.getToken();
