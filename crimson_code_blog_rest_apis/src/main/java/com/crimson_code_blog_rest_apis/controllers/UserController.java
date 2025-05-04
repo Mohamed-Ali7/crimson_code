@@ -123,8 +123,8 @@ public class UserController {
 		return new ResponseEntity<>(operationStatus, HttpStatus.OK);
 	}
 	
-	@PostMapping("/password-reset/validate")
-	public ResponseEntity<OperationStatusResponse> validatePasswordResetToken(@RequestParam() String token) {
+	@GetMapping("/password-reset/validate")
+	public ResponseEntity<OperationStatusResponse> validatePasswordResetToken(@RequestParam String token) {
 
 		OperationStatusResponse operationStatus = new OperationStatusResponse();
 		

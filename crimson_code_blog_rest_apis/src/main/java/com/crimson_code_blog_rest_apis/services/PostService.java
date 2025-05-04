@@ -1,5 +1,7 @@
 package com.crimson_code_blog_rest_apis.services;
 
+import java.util.List;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import com.crimson_code_blog_rest_apis.dto.request.PostRequestModel;
@@ -15,4 +17,6 @@ public interface PostService {
 	PageResponseModel<PostSummaryResponseModel> getAllPosts(int page, int pageSize, String sortBy, String sortDir);
 	PostDetailResponseModel updatePost(long postId, PostRequestModel postRequest, UserPrincipal userPrincipal);
 	void deletePost(long postId, UserPrincipal userPrincipal);
+	PageResponseModel <PostSummaryResponseModel>searchPosts(String searchQuery, List<String> tags, int page,
+			int pageSize, String sortBy, String sortDir);
 }

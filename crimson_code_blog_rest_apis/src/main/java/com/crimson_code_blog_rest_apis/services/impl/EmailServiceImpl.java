@@ -27,7 +27,7 @@ public class EmailServiceImpl implements EmailService {
 	
 	private final String PASSWORD_RESET_HTML_BODY = "<h1>Due to Your Request to Reset Your Password</h1> "
 			+ "<p>Click on the following link to proceed your password reset process</p>"
-			+ "<a href='http://localhost:5500/password_reset.html?token=${tokenValue}'>"
+			+ "<a href='http://localhost:5500/templates/password_reset.html?token=${tokenValue}'>"
 			+ "Your link to reset your password</a>";
 
 	private JavaMailSender javaMailSender;

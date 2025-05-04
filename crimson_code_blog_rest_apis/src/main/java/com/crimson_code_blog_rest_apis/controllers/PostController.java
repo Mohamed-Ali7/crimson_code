@@ -1,5 +1,7 @@
 package com.crimson_code_blog_rest_apis.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -66,10 +68,24 @@ public class PostController {
 			@RequestParam(name = "page", defaultValue = "0") int page,
 			@RequestParam(name = "size", defaultValue = "15") int pageSize,
 			@RequestParam(name = "sort_by", defaultValue = "createdAt") String sortBy,
-			@RequestParam(name = "sort_dir", defaultValue = "asc") String sortDir
+			@RequestParam(name = "sort_dir", defaultValue = "desc") String sortDir
 			){
 		
 		return new ResponseEntity<>(postService.getAllPosts(page, pageSize, sortBy, sortDir), HttpStatus.OK);
+	}
+	
+	@GetMapping("/search")
+	public ResponseEntity<PageResponseModel<PostSummaryResponseModel>> searchPosts(
+			@RequestParam(name = "query", defaultValue = "") String searchQuery,
+			@RequestParam(name = "tags", defaultValue = "") List<String> tags,
+			@RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "15") int pageSize,
+			@RequestParam(name = "sort_by", defaultValue = "createdAt") String sortBy,
+			@RequestParam(name = "sort_dir", defaultValue = "desc") String sortDir
+			){
+		
+		return new ResponseEntity<>(
+				postService.searchPosts(searchQuery, tags, page, pageSize, sortBy, sortDir), HttpStatus.OK);
 	}
 	
 	@PutMapping("/{postId}")

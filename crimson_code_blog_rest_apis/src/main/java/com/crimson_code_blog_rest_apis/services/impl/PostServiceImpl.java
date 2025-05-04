@@ -130,29 +130,38 @@ public class PostServiceImpl implements PostService {
 	public PageResponseModel<PostSummaryResponseModel> getAllPosts(int page, int pageSize, String sortBy, String sortDir) {
 		page = page > 0 ? page - 1 : page; // To make pages start from 1 not 0 as it's more user-friendly
 		
-		Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+		Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 		
 		Pageable pageable = PageRequest.of(page, pageSize, sort);
 		
 		Page<PostEntity> postsPage = postRepository.findAll(pageable);
 		
-		List<PostEntity> posts = postsPage.getContent();
-		
-		List<PostSummaryResponseModel> postsResponse = posts.stream()
-				.map(post -> mapToPostResponse(new PostSummaryResponseModel(), post)).collect(Collectors.toList());
-		
-		PageResponseModel<PostSummaryResponseModel> pageResponse = new PageResponseModel<>();
-		
-		pageResponse.setContent(postsResponse);
-		pageResponse.setPageNumber(++page);
-		pageResponse.setPageSize(postsPage.getNumberOfElements());
-		pageResponse.setTotalElements(postsPage.getTotalElements());
-		pageResponse.setTotalPages(postsPage.getTotalPages());
-		pageResponse.setIsLast(postsPage.isLast());
-		
-		return pageResponse;
+		return buildPostsPage(postsPage, page);
 	}
 
+	@Override
+	public PageResponseModel<PostSummaryResponseModel> searchPosts(String searchQuery, List<String> tags,
+			int page, int pageSize, String sortBy, String sortDir) {
+
+		page = page > 0 ? page - 1 : page;
+		
+		Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+		
+		Pageable pageable = PageRequest.of(page, pageSize, sort);
+		
+		Page<PostEntity> postsPage;
+		
+		if (searchQuery.isBlank() && tags.isEmpty()) {
+			return getAllPosts(page, pageSize, sortBy, sortDir);
+		} else if (searchQuery.isBlank()) {
+			postsPage = postRepository.searchByTags(tags, pageable);
+		} else {
+			postsPage = postRepository.searchByTitleOrTags(searchQuery, tags, pageable);
+		}
+		
+		return buildPostsPage(postsPage, page);
+	}
+	
 	@Override
 	public PostDetailResponseModel updatePost(long postId, PostRequestModel postRequest, UserPrincipal userPrincipal) {
 		PostEntity postEntity = postRepository.findById(postId)
@@ -202,6 +211,25 @@ public class PostServiceImpl implements PostService {
 		postRepository.delete(postEntity);
 	}
 
+	private PageResponseModel<PostSummaryResponseModel> buildPostsPage(Page<PostEntity> postsPage, int page) {
+		
+		List<PostEntity> posts = postsPage.getContent();
+		
+		List<PostSummaryResponseModel> postsResponse = posts.stream()
+				.map(post -> mapToPostResponse(new PostSummaryResponseModel(), post)).collect(Collectors.toList());
+		
+		PageResponseModel<PostSummaryResponseModel> pageResponse = new PageResponseModel<>();
+		
+		pageResponse.setContent(postsResponse);
+		pageResponse.setPageNumber(++page);
+		pageResponse.setPageSize(postsPage.getNumberOfElements());
+		pageResponse.setTotalElements(postsPage.getTotalElements());
+		pageResponse.setTotalPages(postsPage.getTotalPages());
+		pageResponse.setIsLast(postsPage.isLast());
+		
+		return pageResponse;
+	}
+	
 	protected static <T extends PostResponse> T mapToPostResponse(T postResponse, PostEntity postEntity) {
 		
 		postResponse.setId(postEntity.getId());

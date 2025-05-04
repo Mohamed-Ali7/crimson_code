@@ -67,13 +67,12 @@ public class SecurityConfig {
 					 * /api/users/{userId}/posts and /api/users/{userId} will match without any issue.
 					 */
 					.requestMatchers(HttpMethod.GET, "/api/users/*/**").permitAll()
+					.requestMatchers("/api/users/password-reset/**").permitAll()
 					.requestMatchers(HttpMethod.GET, "/images/**").permitAll()
 					.requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
 					.requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
 					.requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll()
 					
-					// matches /api/users/password-reset-request and /api/users/password-reset
-					.requestMatchers(HttpMethod.POST, "/api/users/*").permitAll()
 					.requestMatchers("/api/auth/**").permitAll()
 					
 					.requestMatchers("/api/users/**").authenticated()
