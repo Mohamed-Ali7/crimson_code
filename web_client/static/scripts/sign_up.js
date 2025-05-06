@@ -121,7 +121,7 @@ $(document).ready(function () {
       contentType: 'application/json',
       success: (data) => {
         sessionStorage.setItem('flush_message',
-          '<strong>You have signed up successfully,</strong><br>'+
+          'You have signed up successfully, '+
           'a verification link has sent to your email'
         )
         window.location = `login.html`

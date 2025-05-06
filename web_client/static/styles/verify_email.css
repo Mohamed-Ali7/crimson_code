@@ -1,46 +1,3 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  height: 100vh;
-  background: white;
-  font-family: 'Roboto', sans-serif;
-  color: #F0F0F0;
-  display: flex;
-  flex-direction: column;
-}
-
-.navbar {
-  width: 100%;
-  height: 3.75rem;
-  background-color: #1a1a1a;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 2.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.logo img {
-  width: 10rem;
-  cursor: pointer;
-}
-
-.home-btn {
-  color: #ffffff;
-  font-size: 1rem;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: color 0.3s;
-}
-
-.home-btn:hover {
-  color: #E94560;
-}
-
 .verify-email-wrapper {
   margin: auto;
   display: flex;
@@ -78,7 +35,7 @@ body {
   margin-bottom: 0.5rem;
 }
 
-.icon-failure::before{
+.icon-failure::before {
   position: absolute;
   left: calc(50% - 1rem);
 }
@@ -103,6 +60,7 @@ body {
 }
 
 @media (max-width: 26.5rem) {
+
   .message-container {
     width: 100%;
     max-width: 21rem;
