@@ -20,9 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.crimson_code_blog_rest_apis.dto.request.PostRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
-import com.crimson_code_blog_rest_apis.dto.response.PostDetailResponseModel;
-import com.crimson_code_blog_rest_apis.dto.response.PostResponse;
-import com.crimson_code_blog_rest_apis.dto.response.PostSummaryResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.PostResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.TagResponseModel;
 import com.crimson_code_blog_rest_apis.entity.CategoryEntity;
 import com.crimson_code_blog_rest_apis.entity.PostEntity;
@@ -56,7 +54,7 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public PostDetailResponseModel createPost(PostRequestModel postRequest, MultipartFile postImage) {
+	public PostResponseModel createPost(PostRequestModel postRequest, MultipartFile postImage) {
 		
 		String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 		
@@ -97,7 +95,7 @@ public class PostServiceImpl implements PostService {
 		
 		PostEntity savedPost = postRepository.save(newPost);
 		
-		PostDetailResponseModel postResponse = mapToPostResponse(new PostDetailResponseModel(), savedPost);
+		PostResponseModel postResponse = mapToPostResponse(savedPost);
 		
 		if (savedPost.getTags() != null) {
 			List<TagResponseModel> tagsResponse = savedPost.getTags().stream()
@@ -112,22 +110,18 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public PostDetailResponseModel getPost(long postId) {
+	public PostResponseModel getPost(long postId) {
 
 		PostEntity postEntity = postRepository.findById(postId)
 				.orElseThrow(() -> new ResourceNotFoundException("Post does not exist with id: " + postId));
 		
-		List<TagResponseModel> postTags = postEntity.getTags().stream()
-				.map(tag -> new TagResponseModel(tag.getId(), tag.getName())).collect(Collectors.toList());
-		
-		PostDetailResponseModel postResponse = mapToPostResponse(new PostDetailResponseModel(), postEntity);
-		postResponse.setTags(postTags);
+		PostResponseModel postResponse = mapToPostResponse(postEntity);
 		
 		return postResponse;
 	}
 
 	@Override
-	public PageResponseModel<PostSummaryResponseModel> getAllPosts(int page, int pageSize, String sortBy, String sortDir) {
+	public PageResponseModel<PostResponseModel> getAllPosts(int page, int pageSize, String sortBy, String sortDir) {
 		page = page > 0 ? page - 1 : page; // To make pages start from 1 not 0 as it's more user-friendly
 		
 		Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
@@ -140,7 +134,7 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public PageResponseModel<PostSummaryResponseModel> searchPosts(String searchQuery, List<String> tags,
+	public PageResponseModel<PostResponseModel> searchPosts(String searchQuery, List<String> tags,
 			int page, int pageSize, String sortBy, String sortDir) {
 
 		page = page > 0 ? page - 1 : page;
@@ -163,7 +157,7 @@ public class PostServiceImpl implements PostService {
 	}
 	
 	@Override
-	public PostDetailResponseModel updatePost(long postId, PostRequestModel postRequest, UserPrincipal userPrincipal) {
+	public PostResponseModel updatePost(long postId, PostRequestModel postRequest, UserPrincipal userPrincipal) {
 		PostEntity postEntity = postRepository.findById(postId)
 				.orElseThrow(() -> new ResourceNotFoundException("Post does not exist with id: " + postId));
 		
@@ -189,7 +183,7 @@ public class PostServiceImpl implements PostService {
 		postEntity.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
 		
 		PostEntity updatedPost = postRepository.save(postEntity);
-		PostDetailResponseModel postResponse = mapToPostResponse(new PostDetailResponseModel(), updatedPost);
+		PostResponseModel postResponse = mapToPostResponse(updatedPost);
 		
 		return postResponse;
 	}
@@ -211,14 +205,14 @@ public class PostServiceImpl implements PostService {
 		postRepository.delete(postEntity);
 	}
 
-	private PageResponseModel<PostSummaryResponseModel> buildPostsPage(Page<PostEntity> postsPage, int page) {
+	private PageResponseModel<PostResponseModel> buildPostsPage(Page<PostEntity> postsPage, int page) {
 		
 		List<PostEntity> posts = postsPage.getContent();
 		
-		List<PostSummaryResponseModel> postsResponse = posts.stream()
-				.map(post -> mapToPostResponse(new PostSummaryResponseModel(), post)).collect(Collectors.toList());
+		List<PostResponseModel> postsResponse = posts.stream()
+				.map(post -> mapToPostResponse(post)).collect(Collectors.toList());
 		
-		PageResponseModel<PostSummaryResponseModel> pageResponse = new PageResponseModel<>();
+		PageResponseModel<PostResponseModel> pageResponse = new PageResponseModel<>();
 		
 		pageResponse.setContent(postsResponse);
 		pageResponse.setPageNumber(++page);
@@ -230,7 +224,9 @@ public class PostServiceImpl implements PostService {
 		return pageResponse;
 	}
 	
-	protected static <T extends PostResponse> T mapToPostResponse(T postResponse, PostEntity postEntity) {
+	protected static PostResponseModel mapToPostResponse(PostEntity postEntity) {
+		
+		PostResponseModel postResponse = new PostResponseModel();
 		
 		postResponse.setId(postEntity.getId());
 		postResponse.setTitle(postEntity.getTitle());
@@ -240,7 +236,12 @@ public class PostServiceImpl implements PostService {
 		postResponse.setCreatedAt(postEntity.getCreatedAt());
 		postResponse.setUpdatedAt(postEntity.getUpdatedAt());
 		postResponse.setCategoryId(postEntity.getCategory().getId());
-				
+		
+		List<TagResponseModel> postTags = postEntity.getTags().stream()
+				.map(tag -> new TagResponseModel(tag.getId(), tag.getName())).collect(Collectors.toList());
+		
+		postResponse.setTags(postTags);
+		
 		return postResponse;
 	}
 }

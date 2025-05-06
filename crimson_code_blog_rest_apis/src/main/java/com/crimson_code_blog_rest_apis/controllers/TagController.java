@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.crimson_code_blog_rest_apis.dto.request.TagRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.OperationStatusResponse;
 import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
-import com.crimson_code_blog_rest_apis.dto.response.PostSummaryResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.PostResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.TagResponseModel;
 import com.crimson_code_blog_rest_apis.services.TagService;
 import com.crimson_code_blog_rest_apis.utils.OperationName;
@@ -82,7 +82,7 @@ public class TagController {
 	}
 	
 	@GetMapping("/{tagId}/posts")
-	public ResponseEntity<PageResponseModel<PostSummaryResponseModel>> getTagPosts(@PathVariable long tagId,
+	public ResponseEntity<PageResponseModel<PostResponseModel>> getTagPosts(@PathVariable long tagId,
 			@RequestParam(name = "page", defaultValue = "0") int page,
 			@RequestParam(name = "size", defaultValue = "15") int pageSize,
 			@RequestParam(name = "sort_by", defaultValue = "createdAt") String sortBy,

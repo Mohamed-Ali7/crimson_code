@@ -1,8 +1,9 @@
 package com.crimson_code_blog_rest_apis.dto.response;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
-public class PostResponse {
+public class PostResponseModel {
 	private long id;
 	private String title;
 	private String content;
@@ -11,12 +12,13 @@ public class PostResponse {
 	private String userPublicId;
 	private OffsetDateTime createdAt;
 	private OffsetDateTime updatedAt;
+	private List<TagResponseModel> tags;
 	
-	public PostResponse() {
+	public PostResponseModel() {
 		
 	}
 
-	public PostResponse(long id, String title, String content, String imageUrl, long categoryId, String userPublicId,
+	public PostResponseModel(long id, String title, String content, String imageUrl, long categoryId, String userPublicId,
 			OffsetDateTime createdAt, OffsetDateTime updatedAt) {
 		this.id = id;
 		this.title = title;
@@ -90,4 +92,13 @@ public class PostResponse {
 	public void setUpdatedAt(OffsetDateTime updatedAt) {
 		this.updatedAt = updatedAt;
 	}
+
+	public List<TagResponseModel> getTags() {
+		return tags;
+	}
+
+	public void setTags(List<TagResponseModel> tags) {
+		this.tags = tags;
+	}
+	
 }
