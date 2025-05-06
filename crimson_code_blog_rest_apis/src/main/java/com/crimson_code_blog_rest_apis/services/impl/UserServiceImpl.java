@@ -22,7 +22,7 @@ import com.crimson_code_blog_rest_apis.dto.request.PasswordResetConfirmationRequ
 import com.crimson_code_blog_rest_apis.dto.request.PasswordResetRequestModel;
 import com.crimson_code_blog_rest_apis.dto.request.UpdateUserRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
-import com.crimson_code_blog_rest_apis.dto.response.PostSummaryResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.PostResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.UserResponseModel;
 import com.crimson_code_blog_rest_apis.entity.PasswordResetTokenEntity;
 import com.crimson_code_blog_rest_apis.entity.PostEntity;
@@ -258,7 +258,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public PageResponseModel<PostSummaryResponseModel> getUserPosts(String publicId, int page, int pageSize, String sortBy,
+	public PageResponseModel<PostResponseModel> getUserPosts(String publicId, int page, int pageSize, String sortBy,
 			String sortDir) {
 
 		UserEntity userEntity = userRepository.findByPublicId(publicId)
@@ -274,11 +274,11 @@ public class UserServiceImpl implements UserService {
 		
 		List<PostEntity> userPosts = userPostsPage.getContent();
 		
-		List<PostSummaryResponseModel> userPostsResponse = userPosts.stream()
-				.map(post -> PostServiceImpl.mapToPostResponse(new PostSummaryResponseModel(), post))
+		List<PostResponseModel> userPostsResponse = userPosts.stream()
+				.map(post -> PostServiceImpl.mapToPostResponse(post))
 				.collect(Collectors.toList());
 		
-		PageResponseModel<PostSummaryResponseModel> pageResponse = new PageResponseModel<>();
+		PageResponseModel<PostResponseModel> pageResponse = new PageResponseModel<>();
 		
 		pageResponse.setContent(userPostsResponse);
 		pageResponse.setPageNumber(++page);

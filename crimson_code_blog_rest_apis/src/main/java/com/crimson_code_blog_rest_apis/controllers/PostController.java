@@ -20,8 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.crimson_code_blog_rest_apis.dto.request.PostRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.OperationStatusResponse;
 import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
-import com.crimson_code_blog_rest_apis.dto.response.PostDetailResponseModel;
-import com.crimson_code_blog_rest_apis.dto.response.PostSummaryResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.PostResponseModel;
 import com.crimson_code_blog_rest_apis.security.UserPrincipal;
 import com.crimson_code_blog_rest_apis.services.PostService;
 import com.crimson_code_blog_rest_apis.utils.OperationName;
@@ -49,7 +48,7 @@ public class PostController {
 	 */
 	
 	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-	public ResponseEntity<PostDetailResponseModel> createPost(
+	public ResponseEntity<PostResponseModel> createPost(
 			@Valid @RequestPart("post") PostRequestModel postRequest,
 			@RequestPart(value = "postImage", required = false) MultipartFile postImage) {
 		
@@ -57,12 +56,12 @@ public class PostController {
 	}
 	
 	@GetMapping("/{postId}")
-	public ResponseEntity<PostDetailResponseModel> getPost(@PathVariable long postId) {
+	public ResponseEntity<PostResponseModel> getPost(@PathVariable long postId) {
 		return new ResponseEntity<>(postService.getPost(postId), HttpStatus.OK);
 	}
 	
 	@GetMapping
-	public ResponseEntity<PageResponseModel<PostSummaryResponseModel>> getAllPosts(
+	public ResponseEntity<PageResponseModel<PostResponseModel>> getAllPosts(
 			@RequestParam(name = "page", defaultValue = "0") int page,
 			@RequestParam(name = "size", defaultValue = "15") int pageSize,
 			@RequestParam(name = "sort_by", defaultValue = "createdAt") String sortBy,
@@ -73,7 +72,7 @@ public class PostController {
 	}
 	
 	@PutMapping("/{postId}")
-	public ResponseEntity<PostDetailResponseModel> updatePost(@PathVariable long postId,
+	public ResponseEntity<PostResponseModel> updatePost(@PathVariable long postId,
 			@Valid @RequestBody PostRequestModel postRequest,
 			@AuthenticationPrincipal UserPrincipal userPrincipal) {
 		

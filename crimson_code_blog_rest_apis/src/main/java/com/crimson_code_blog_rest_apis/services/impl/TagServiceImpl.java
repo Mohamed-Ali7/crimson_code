@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.crimson_code_blog_rest_apis.dto.request.TagRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
-import com.crimson_code_blog_rest_apis.dto.response.PostSummaryResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.PostResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.TagResponseModel;
 import com.crimson_code_blog_rest_apis.entity.PostEntity;
 import com.crimson_code_blog_rest_apis.entity.TagEntity;
@@ -110,7 +110,7 @@ public class TagServiceImpl implements TagService {
 	}
 
 	@Override
-	public PageResponseModel<PostSummaryResponseModel> getTagPosts(long tagId, int page, int pageSize, String sortBy,
+	public PageResponseModel<PostResponseModel> getTagPosts(long tagId, int page, int pageSize, String sortBy,
 			String sortDir) {
 
 		TagEntity tagEntity = tagRepository.findById(tagId)
@@ -126,11 +126,11 @@ public class TagServiceImpl implements TagService {
 		
 		List<PostEntity> tagPosts = tagPostsPage.getContent();
 		
-		List<PostSummaryResponseModel> tagPostsResponse = tagPosts.stream()
-				.map(post -> PostServiceImpl.mapToPostResponse(new PostSummaryResponseModel(), post))
+		List<PostResponseModel> tagPostsResponse = tagPosts.stream()
+				.map(post -> PostServiceImpl.mapToPostResponse(post))
 				.collect(Collectors.toList());
 		
-		PageResponseModel<PostSummaryResponseModel> pageResponse = new PageResponseModel<>();
+		PageResponseModel<PostResponseModel> pageResponse = new PageResponseModel<>();
 		
 		pageResponse.setContent(tagPostsResponse);
 		pageResponse.setPageNumber(++page);
