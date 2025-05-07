@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,9 +20,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.crimson_code_blog_rest_apis.dto.request.PostRequestModel;
+import com.crimson_code_blog_rest_apis.dto.response.CategoryResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.PostResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.TagResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.UserSummaryResponseModel;
 import com.crimson_code_blog_rest_apis.entity.CategoryEntity;
 import com.crimson_code_blog_rest_apis.entity.PostEntity;
 import com.crimson_code_blog_rest_apis.entity.TagEntity;
@@ -36,6 +39,8 @@ import com.crimson_code_blog_rest_apis.services.PostService;
 import com.crimson_code_blog_rest_apis.utils.GlobalUtils;
 import com.crimson_code_blog_rest_apis.utils.UserRoles;
 
+import ch.qos.logback.core.model.Model;
+
 @Service
 public class PostServiceImpl implements PostService {
 	
@@ -43,14 +48,16 @@ public class PostServiceImpl implements PostService {
 	private UserRepository userRepository;
 	private CategoryRepository categoryRepository;
 	private TagRepository tagRepository;
+	private static ModelMapper modelMapper;
 
 	@Autowired
 	public PostServiceImpl(PostRepository postRepository, UserRepository userRepository,
-			CategoryRepository categoryRepository, TagRepository tagRepository) {
+			CategoryRepository categoryRepository, TagRepository tagRepository, ModelMapper modelMapper) {
 		this.postRepository = postRepository;
 		this.userRepository = userRepository;
 		this.categoryRepository = categoryRepository;
 		this.tagRepository = tagRepository;
+		PostServiceImpl.modelMapper = modelMapper;
 	}
 
 	@Override
@@ -232,10 +239,10 @@ public class PostServiceImpl implements PostService {
 		postResponse.setTitle(postEntity.getTitle());
 		postResponse.setContent(postEntity.getContent());
 		postResponse.setImageUrl(postEntity.getImageUrl());
-		postResponse.setUserPublicId(postEntity.getUserPublicId());
+		postResponse.setUser(modelMapper.map(postEntity.getUser(), UserSummaryResponseModel.class));
 		postResponse.setCreatedAt(postEntity.getCreatedAt());
 		postResponse.setUpdatedAt(postEntity.getUpdatedAt());
-		postResponse.setCategoryId(postEntity.getCategory().getId());
+		postResponse.setCategory(modelMapper.map(postEntity.getCategory(), CategoryResponseModel.class));
 		
 		List<TagResponseModel> postTags = postEntity.getTags().stream()
 				.map(tag -> new TagResponseModel(tag.getId(), tag.getName())).collect(Collectors.toList());

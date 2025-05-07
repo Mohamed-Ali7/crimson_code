@@ -8,8 +8,8 @@ public class PostResponseModel {
 	private String title;
 	private String content;
 	private String imageUrl;
-	private long categoryId;
-	private String userPublicId;
+	private CategoryResponseModel category;
+	private UserSummaryResponseModel user;
 	private OffsetDateTime createdAt;
 	private OffsetDateTime updatedAt;
 	private List<TagResponseModel> tags;
@@ -18,15 +18,16 @@ public class PostResponseModel {
 		
 	}
 
-	public PostResponseModel(long id, String title, String content, String imageUrl, long categoryId, String userPublicId,
-			OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+	public PostResponseModel(long id, String title, String content, String imageUrl, CategoryResponseModel category,
+			UserSummaryResponseModel user, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
 		this.id = id;
 		this.title = title;
 		this.content = content;
 		this.imageUrl = imageUrl;
-		this.userPublicId = userPublicId;
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
+		this.category = category;
+		this.user = user;
 	}
 
 	public long getId() {
@@ -61,20 +62,20 @@ public class PostResponseModel {
 		this.imageUrl = imageUrl;
 	}
 
-	public long getCategoryId() {
-		return categoryId;
+	public CategoryResponseModel getCategory() {
+		return category;
 	}
 
-	public void setCategoryId(long categoryId) {
-		this.categoryId = categoryId;
+	public void setCategory(CategoryResponseModel category) {
+		this.category = category;
 	}
 
-	public String getUserPublicId() {
-		return userPublicId;
+	public UserSummaryResponseModel getUser() {
+		return user;
 	}
 
-	public void setUserPublicId(String userPublicId) {
-		this.userPublicId = userPublicId;
+	public void setUser(UserSummaryResponseModel user) {
+		this.user = user;
 	}
 
 	public OffsetDateTime getCreatedAt() {
