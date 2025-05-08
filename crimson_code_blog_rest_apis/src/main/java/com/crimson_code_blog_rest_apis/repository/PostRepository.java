@@ -13,22 +13,25 @@ import com.crimson_code_blog_rest_apis.entity.PostEntity;
 
 public interface PostRepository extends JpaRepository<PostEntity, Long> {
 
-	
 	@Override
 	@EntityGraph(attributePaths = {"user", "category", "tags"})
 	Page<PostEntity> findAll(Pageable pageable);
 	
+	@EntityGraph(attributePaths = {"user", "category", "tags"})
 	Page<PostEntity> findAllByUserId(long userId, Pageable pageable);
+	
+	@EntityGraph(attributePaths = {"user", "category", "tags"})
 	Page<PostEntity> findAllByCategoryId(long categoryId, Pageable pageable);
 	
+	@EntityGraph(attributePaths = {"user", "category", "tags"})
 	//@Query("SELECT post FROM PostEntity post JOIN post.tags tag WHERE tag.id = :tagId") // using JPQL Query
 	Page<PostEntity> findByTags_Id(long tagId, Pageable pageable);
 	
+	@EntityGraph(attributePaths = {"user", "category", "tags"})
 	@Query("SELECT DISTINCT post FROM PostEntity post LEFT JOIN post.tags tag WHERE post.title LIKE %:title% OR tag.name IN :tags")
 	Page<PostEntity> searchByTitleOrTags(@Param("title") String title, @Param("tags") List<String> tags, Pageable pageable);
 	
-	
+	@EntityGraph(attributePaths = {"user", "category", "tags"})
 	@Query("SELECT DISTINCT post FROM PostEntity post LEFT JOIN post.tags tag WHERE tag.name IN :tags")
 	Page<PostEntity> searchByTags(@Param("tags") List<String> tags, Pageable pageable);
-	
 }
