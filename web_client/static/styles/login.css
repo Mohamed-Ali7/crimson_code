@@ -14,6 +14,7 @@
   width: 100%;
   max-width: 25rem;
   text-align: center;
+  margin: 3rem 0;
 }
 
 .flush-message {
@@ -139,7 +140,6 @@
 @media (max-width: 25rem) {
 
   .login-card {
-    margin-top: -3rem;
     padding: 1.5rem 2rem;
   }
 }

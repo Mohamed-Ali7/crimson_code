@@ -43,7 +43,7 @@ $(document).ready(function () {
 
     return await $.ajax({
       method: `GET`,
-      url: `http://${host}/api/tags`,
+      url: `http://${host}/api/tags?size=100000`,
       contentType: `application/json`
     }).then(function (data) {
       sessionStorage.setItem(`tags`, JSON.stringify(data.content));
@@ -97,7 +97,7 @@ $(document).ready(function () {
 
     return await $.ajax({
       method: `GET`,
-      url: `http://${host}/api/categories`,
+      url: `http://${host}/api/categories?size=10000`,
       contentType: `application/json`
     }).then(function (data) {
       sessionStorage.setItem(`categories`, JSON.stringify(data.content));
@@ -136,7 +136,7 @@ $(document).ready(function () {
     $('.user-profile').show();
   }
 
-  const mainWrapper = $(`.main-wrapper`);
+  const mainWrapper = $(`body main`);
   const navButtons = $(`.navbar-buttons`);
   const leftNavButtons = $(`.nav-left-buttons`);
   const navbarSearch = $(`.search-container`);
@@ -173,6 +173,7 @@ $(document).ready(function () {
 
   $(`.mobile-view-search-btn`).on(`click`, function () {
     $(`.search-container`).css(`display`, `flex`);
+    $(`.main-search-input`).focus();
     $(`.navbar-buttons`).hide();
     $(`.menu-bar`).removeClass(`active`);
   });
@@ -330,5 +331,8 @@ $(document).ready(function () {
   $(`.nav-left-buttons .home-btn`).on(`click`, function () {
     window.location = `home.html`;
   });
+
+
+  $(`.site-footer .footer-bottom p`).text(`© ${new Date().getFullYear()} Crimson Code. All rights reserved.`);
 
 }); 
