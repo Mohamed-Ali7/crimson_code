@@ -43,7 +43,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 	@Override
 	public CategoryResponseModel createCategory(CategoryRequestModel categoryRequest) {
-		Optional<CategoryEntity> category = categoryRepository.findByName(categoryRequest.getName());
+		Optional<CategoryEntity> category = categoryRepository.findByNameIgnoreCase(categoryRequest.getName());
 		
 		if (category.isPresent()) {
 			throw new CrimsonCodeGlobalException("This category already exists");

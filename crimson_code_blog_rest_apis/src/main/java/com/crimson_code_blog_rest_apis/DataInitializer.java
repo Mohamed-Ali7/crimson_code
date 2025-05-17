@@ -52,7 +52,7 @@ public class DataInitializer implements CommandLineRunner {
 	
 	private void initialCategories() {
 		for (DefaultCategory category : DefaultCategory.values()) {
-			categoryRepository.findByName(category.getDisplayName())
+			categoryRepository.findByNameIgnoreCase(category.getDisplayName())
 			
 			.orElseGet(() -> categoryRepository.save(
 					new CategoryEntity(category.getDisplayName(), category.getDescription())
@@ -62,8 +62,8 @@ public class DataInitializer implements CommandLineRunner {
 	
 	private void initialTags() {
 		for (DefaultTag tag : DefaultTag.values()) {
-			tagRepository.findByName(tag.getDisplayName())
-			.orElseGet(() -> tagRepository.save(new TagEntity(tag.getDisplayName())));
+			tagRepository.findByNameIgnoreCase(tag.getDisplayName().toLowerCase())
+			.orElseGet(() -> tagRepository.save(new TagEntity(tag.getDisplayName().toLowerCase())));
 		}
 	}
 	

@@ -41,7 +41,7 @@ public class TagServiceImpl implements TagService {
 	@Override
 	public TagResponseModel createTag(TagRequestModel tagRequest) {
 
-		TagEntity newTag = tagRepository.findByName(tagRequest.getName())
+		TagEntity newTag = tagRepository.findByNameIgnoreCase(tagRequest.getName())
 				.orElseGet(() -> tagRepository.save(new TagEntity(tagRequest.getName())));
 		
 		TagResponseModel tagResponse = modelMapper.map(newTag, TagResponseModel.class);

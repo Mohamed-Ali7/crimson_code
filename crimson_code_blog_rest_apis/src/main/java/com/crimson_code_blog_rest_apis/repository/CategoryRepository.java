@@ -8,5 +8,5 @@ import com.crimson_code_blog_rest_apis.entity.CategoryEntity;
 
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
 
-	Optional<CategoryEntity> findByName(String name);
+	Optional<CategoryEntity> findByNameIgnoreCase(String name);
 }
