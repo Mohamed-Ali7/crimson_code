@@ -87,16 +87,19 @@ public class PostController {
 				postService.searchPosts(searchQuery, tags, page, pageSize, sortBy, sortDir), HttpStatus.OK);
 	}
 	
-	@PutMapping("/{postId}")
-	public ResponseEntity<PostResponseModel> updatePost(@PathVariable long postId,
-			@Valid @RequestBody PostRequestModel postRequest,
-			@AuthenticationPrincipal UserPrincipal userPrincipal) {
+	@PutMapping(value = "/{postId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+	public ResponseEntity<PostResponseModel> updatePost(
+			@PathVariable long postId,
+			@AuthenticationPrincipal UserPrincipal userPrincipal,
+			@Valid @RequestPart("post") PostRequestModel postRequest,
+			@RequestPart(value = "postImage", required = false) MultipartFile postImage) {
 		
-		return new ResponseEntity<>(postService.updatePost(postId, postRequest, userPrincipal), HttpStatus.OK);
+		return new ResponseEntity<>(postService.updatePost(postId, postRequest, postImage, userPrincipal), HttpStatus.OK);
 	}
 	
+	
 	@DeleteMapping("/{postId}")
-	public ResponseEntity<OperationStatusResponse> updatePost(@PathVariable long postId,
+	public ResponseEntity<OperationStatusResponse> deletePost(@PathVariable long postId,
 			@AuthenticationPrincipal UserPrincipal userPrincipal) {
 
 		OperationStatusResponse operationStatus = new OperationStatusResponse();
