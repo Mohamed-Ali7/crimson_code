@@ -5,6 +5,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.crimson_code_blog_rest_apis.dto.request.CommentRequestModel;
 import com.crimson_code_blog_rest_apis.dto.response.CommentResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.UserResponseModel;
 import com.crimson_code_blog_rest_apis.entity.CommentEntity;
 import com.crimson_code_blog_rest_apis.entity.PostEntity;
 import com.crimson_code_blog_rest_apis.entity.UserEntity;
@@ -36,13 +38,15 @@ public class CommentServiceImpl implements CommentService {
 	private PostRepository postRepository;
 	private CommentRepository commentRepository;
 	private UserRepository userRepository;
+	private ModelMapper modelMapper;
 	
 	@Autowired
 	public CommentServiceImpl(PostRepository postRepository, CommentRepository commentRepository,
-			UserRepository userRepository) {
+			UserRepository userRepository, ModelMapper modelMapper) {
 		this.postRepository = postRepository;
 		this.commentRepository = commentRepository;
 		this.userRepository = userRepository;
+		this.modelMapper = modelMapper;
 	}
 
 	@Override
@@ -187,7 +191,7 @@ public class CommentServiceImpl implements CommentService {
 		CommentResponseModel commentResponse = new CommentResponseModel();
 
 		commentResponse.setId(commentEntity.getId());
-		commentResponse.setUserPublicId(commentEntity.getUserPublicId());
+		commentResponse.setUser(modelMapper.map(commentEntity.getUser(), UserResponseModel.class));
 		commentResponse.setContent(commentEntity.getContent());
 		commentResponse.setCreatedAt(commentEntity.getCreatedAt());
 		commentResponse.setUpdatedAt(commentEntity.getUpdatedAt());

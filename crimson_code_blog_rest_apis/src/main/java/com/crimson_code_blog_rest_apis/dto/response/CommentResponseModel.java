@@ -6,7 +6,7 @@ public class CommentResponseModel {
 
 	private long id;
 	private String content;
-	private String userPublicId;
+	private UserResponseModel user;
 	private OffsetDateTime createdAt;
 	private OffsetDateTime updatedAt;
 	
@@ -14,11 +14,11 @@ public class CommentResponseModel {
 		
 	}
 
-	public CommentResponseModel(long id, String content, String userPublicId, OffsetDateTime createdAt,
+	public CommentResponseModel(long id, String content, UserResponseModel user, OffsetDateTime createdAt,
 			OffsetDateTime updatedAt) {
 		this.id = id;
 		this.content = content;
-		this.userPublicId = userPublicId;
+		this.user = user;
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
 	}
@@ -39,12 +39,12 @@ public class CommentResponseModel {
 		this.content = content;
 	}
 
-	public String getUserPublicId() {
-		return userPublicId;
+	public UserResponseModel getUser() {
+		return user;
 	}
 
-	public void setUserPublicId(String userPublicId) {
-		this.userPublicId = userPublicId;
+	public void setUser(UserResponseModel user) {
+		this.user = user;
 	}
 
 	public OffsetDateTime getCreatedAt() {
