@@ -1,7 +1,12 @@
 package com.crimson_code_blog_rest_apis.services.impl;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +34,7 @@ import com.crimson_code_blog_rest_apis.entity.CategoryEntity;
 import com.crimson_code_blog_rest_apis.entity.PostEntity;
 import com.crimson_code_blog_rest_apis.entity.TagEntity;
 import com.crimson_code_blog_rest_apis.entity.UserEntity;
+import com.crimson_code_blog_rest_apis.exceptions.CrimsonCodeGlobalException;
 import com.crimson_code_blog_rest_apis.exceptions.ResourceNotFoundException;
 import com.crimson_code_blog_rest_apis.repository.CategoryRepository;
 import com.crimson_code_blog_rest_apis.repository.PostRepository;
@@ -39,7 +45,6 @@ import com.crimson_code_blog_rest_apis.services.PostService;
 import com.crimson_code_blog_rest_apis.utils.GlobalUtils;
 import com.crimson_code_blog_rest_apis.utils.UserRoles;
 
-import ch.qos.logback.core.model.Model;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -94,7 +99,7 @@ public class PostServiceImpl implements PostService {
 		
 		if (postRequest.getTags() != null) {
 			postRequest.getTags().forEach(tag -> {
-				TagEntity tagEntity = tagRepository.findByName(tag)
+				TagEntity tagEntity = tagRepository.findByNameIgnoreCase(tag)
 						.orElseGet(() -> tagRepository.save(new TagEntity(tag)));
 				newPost.addTag(tagEntity);
 			});
@@ -164,7 +169,9 @@ public class PostServiceImpl implements PostService {
 	}
 	
 	@Override
-	public PostResponseModel updatePost(long postId, PostRequestModel postRequest, UserPrincipal userPrincipal) {
+	public PostResponseModel updatePost(long postId, PostRequestModel postRequest, MultipartFile postImage,
+			UserPrincipal userPrincipal) {
+
 		PostEntity postEntity = postRepository.findById(postId)
 				.orElseThrow(() -> new ResourceNotFoundException("Post does not exist with id: " + postId));
 		
@@ -187,7 +194,53 @@ public class PostServiceImpl implements PostService {
 			
 			postEntity.setCategory(categoryEntity);
 		}
+		
 		postEntity.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
+		
+		
+		if (postImage != null && !postImage.isEmpty()) {
+			
+			if (postEntity.getImageUrl() != null) {
+		        String existingImagePath = postEntity.getImageUrl().replace("/images/", "uploads/");
+		        Path existingImage = Paths.get(existingImagePath);
+
+		        try {
+		            Files.deleteIfExists(existingImage);
+		        } catch (IOException e) {
+		            throw new CrimsonCodeGlobalException("Failed to delete existing image.");
+		        }
+		    }
+			
+			String fileName = UUID.randomUUID().toString() + "_" + postImage.getOriginalFilename();
+			GlobalUtils.saveImage(postImage, fileName, "post_image/");
+			String imageUrl = "/images/post_image/" + fileName;
+			postEntity.setImageUrl(imageUrl);
+		}
+		
+		
+		if (postRequest.getTags() != null) {
+			
+			List<String> requestTags = postRequest.getTags();
+			
+			List<TagEntity> existedTagEntities = tagRepository.findAllByNameIn(requestTags);
+			
+			List<String> existedTagNames = existedTagEntities.stream()
+					.map(tag -> tag.getName().toLowerCase()).collect(Collectors.toList());
+			
+			List <TagEntity> newTagEntities = requestTags.stream()
+					.filter(requestTag -> !existedTagNames.contains(requestTag.toLowerCase()))
+					.map(requestTag -> new TagEntity(requestTag.toLowerCase()))
+					.collect(Collectors.toList());
+
+			List<TagEntity> savedNewTagEntities = tagRepository.saveAll(newTagEntities);
+			
+			List <TagEntity> allPostTags = new ArrayList<>();
+			
+			allPostTags.addAll(existedTagEntities);
+			allPostTags.addAll(savedNewTagEntities);
+			
+			postEntity.setTags(allPostTags);
+		}
 		
 		PostEntity updatedPost = postRepository.save(postEntity);
 		PostResponseModel postResponse = mapToPostResponse(updatedPost);
@@ -244,10 +297,13 @@ public class PostServiceImpl implements PostService {
 		postResponse.setUpdatedAt(postEntity.getUpdatedAt());
 		postResponse.setCategory(modelMapper.map(postEntity.getCategory(), CategoryResponseModel.class));
 		
-		List<TagResponseModel> postTags = postEntity.getTags().stream()
-				.map(tag -> new TagResponseModel(tag.getId(), tag.getName())).collect(Collectors.toList());
-		
-		postResponse.setTags(postTags);
+		if (postEntity.getTags() != null) {
+			List<TagResponseModel> postTags = postEntity.getTags().stream()
+					.map(tag -> new TagResponseModel(tag.getId(), tag.getName())).collect(Collectors.toList());
+			postResponse.setTags(postTags);
+		} else {
+			postResponse.setTags(Collections.emptyList());
+		}
 		
 		return postResponse;
 	}

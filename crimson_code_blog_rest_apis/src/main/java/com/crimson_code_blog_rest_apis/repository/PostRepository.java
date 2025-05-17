@@ -1,6 +1,7 @@
 package com.crimson_code_blog_rest_apis.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,9 @@ import com.crimson_code_blog_rest_apis.entity.PostEntity;
 
 public interface PostRepository extends JpaRepository<PostEntity, Long> {
 
+	@EntityGraph(attributePaths = {"user", "category", "tags"})
+	Optional<PostEntity> findById(long id);
+	
 	@Override
 	@EntityGraph(attributePaths = {"user", "category", "tags"})
 	Page<PostEntity> findAll(Pageable pageable);

@@ -15,7 +15,9 @@ public interface PostService {
 	PostResponseModel createPost(PostRequestModel postRequest, MultipartFile postImage);
 	PostResponseModel getPost(long postId);
 	PageResponseModel<PostResponseModel> getAllPosts(int page, int pageSize, String sortBy, String sortDir);
-	PostResponseModel updatePost(long postId, PostRequestModel postRequest, UserPrincipal userPrincipal);
+	PostResponseModel updatePost(long postId, PostRequestModel postRequest, MultipartFile postImage,
+			UserPrincipal userPrincipal);
+
 	void deletePost(long postId, UserPrincipal userPrincipal);
 	PageResponseModel <PostResponseModel>searchPosts(String searchQuery, List<String> tags, int page,
 			int pageSize, String sortBy, String sortDir);
