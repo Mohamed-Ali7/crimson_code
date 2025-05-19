@@ -25,17 +25,23 @@ public interface PostRepository extends JpaRepository<PostEntity, Long> {
 	Page<PostEntity> findAllByUserId(long userId, Pageable pageable);
 	
 	@EntityGraph(attributePaths = {"user", "category", "tags"})
-	Page<PostEntity> findAllByCategoryId(long categoryId, Pageable pageable);
+	Page<PostEntity> findAllByCategoryNameIgnoreCase(String categoryName, Pageable pageable);
 	
 	@EntityGraph(attributePaths = {"user", "category", "tags"})
-	//@Query("SELECT post FROM PostEntity post JOIN post.tags tag WHERE tag.id = :tagId") // using JPQL Query
-	Page<PostEntity> findByTags_Id(long tagId, Pageable pageable);
+	@Query("SELECT post FROM PostEntity post JOIN post.tags tag WHERE LOWER(tag.name) = LOWER(:tagName)") // using JPQL Query
+	Page<PostEntity> findAllByTagName(@Param("tagName") String tagName, Pageable pageable);
 	
 	@EntityGraph(attributePaths = {"user", "category", "tags"})
-	@Query("SELECT DISTINCT post FROM PostEntity post LEFT JOIN post.tags tag WHERE post.title LIKE %:title% OR tag.name IN :tags")
+	@Query("""
+		    SELECT DISTINCT post 
+		    FROM PostEntity post 
+		    LEFT JOIN post.tags tag 
+		    WHERE LOWER(post.title) LIKE LOWER(CONCAT('%', :title, '%')) 
+		       OR LOWER(tag.name) IN :tags
+		""")
 	Page<PostEntity> searchByTitleOrTags(@Param("title") String title, @Param("tags") List<String> tags, Pageable pageable);
 	
 	@EntityGraph(attributePaths = {"user", "category", "tags"})
-	@Query("SELECT DISTINCT post FROM PostEntity post LEFT JOIN post.tags tag WHERE tag.name IN :tags")
+	@Query("SELECT DISTINCT post FROM PostEntity post LEFT JOIN post.tags tag WHERE LOWER(tag.name) IN :tags")
 	Page<PostEntity> searchByTags(@Param("tags") List<String> tags, Pageable pageable);
 }

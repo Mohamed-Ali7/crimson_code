@@ -110,11 +110,11 @@ public class TagServiceImpl implements TagService {
 	}
 
 	@Override
-	public PageResponseModel<PostResponseModel> getTagPosts(long tagId, int page, int pageSize, String sortBy,
+	public PageResponseModel<PostResponseModel> getTagPosts(String tagName, int page, int pageSize, String sortBy,
 			String sortDir) {
 
-		TagEntity tagEntity = tagRepository.findById(tagId)
-				.orElseThrow(() -> new ResourceNotFoundException("Tag does not exist with id: " + tagId));
+		TagEntity tagEntity = tagRepository.findByNameIgnoreCase(tagName)
+				.orElseThrow(() -> new ResourceNotFoundException("Tag does not exist with name: " + tagName));
 		
 		page = page > 0 ? page - 1 : page; // To make pages start from 1 not 0 as it's more user-friendly
 		
@@ -122,7 +122,7 @@ public class TagServiceImpl implements TagService {
 		
 		Pageable pageable = PageRequest.of(page, pageSize, sort);
 		
-		Page<PostEntity> tagPostsPage = postRepository.findByTags_Id(tagEntity.getId(), pageable);
+		Page<PostEntity> tagPostsPage = postRepository.findAllByTagName(tagEntity.getName(), pageable);
 		
 		List<PostEntity> tagPosts = tagPostsPage.getContent();
 		

@@ -126,11 +126,11 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
-	public PageResponseModel<PostResponseModel> getCategoryPosts(long categoryId, int page, int pageSize, String sortBy,
+	public PageResponseModel<PostResponseModel> getCategoryPosts(String categoryName, int page, int pageSize, String sortBy,
 			String sortDir) {
 
-		CategoryEntity categoryEntity = categoryRepository.findById(categoryId)
-				.orElseThrow(() -> new ResourceNotFoundException("Category does not exist with id: " + categoryId));
+		CategoryEntity categoryEntity = categoryRepository.findByNameIgnoreCase(categoryName)
+				.orElseThrow(() -> new ResourceNotFoundException("Category does not exist with name: " + categoryName));
 		
 		page = page > 0 ? page - 1 : page; // To make pages start from 1 not 0 as it's more user-friendly
 		
@@ -138,7 +138,7 @@ public class CategoryServiceImpl implements CategoryService {
 		
 		Pageable pageable = PageRequest.of(page, pageSize, sort);
 		
-		Page<PostEntity> categoryPostsPage = postRepository.findAllByCategoryId(categoryEntity.getId(), pageable);
+		Page<PostEntity> categoryPostsPage = postRepository.findAllByCategoryNameIgnoreCase(categoryEntity.getName(), pageable);
 		
 		List<PostEntity> categoryPosts = categoryPostsPage.getContent();
 		

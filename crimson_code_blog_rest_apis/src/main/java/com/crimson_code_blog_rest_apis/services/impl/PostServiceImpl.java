@@ -155,6 +155,8 @@ public class PostServiceImpl implements PostService {
 		
 		Pageable pageable = PageRequest.of(page, pageSize, sort);
 		
+		tags = tags.stream().map(tag -> tag.toLowerCase()).toList();
+		
 		Page<PostEntity> postsPage;
 		
 		if (searchQuery.isBlank() && tags.isEmpty()) {

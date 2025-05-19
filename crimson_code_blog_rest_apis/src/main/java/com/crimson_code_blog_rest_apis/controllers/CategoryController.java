@@ -84,8 +84,8 @@ public class CategoryController {
 		return operationStatus;
 	}
 	
-	@GetMapping("/{categoryId}/posts")
-	public ResponseEntity<PageResponseModel<PostResponseModel>> getCategoryPosts(@PathVariable long categoryId,
+	@GetMapping("/{categoryName}/posts")
+	public ResponseEntity<PageResponseModel<PostResponseModel>> getCategoryPosts(@PathVariable String categoryName,
 			@RequestParam(name = "page", defaultValue = "0") int page,
 			@RequestParam(name = "size", defaultValue = "15") int pageSize,
 			@RequestParam(name = "sort_by", defaultValue = "createdAt") String sortBy,
@@ -93,7 +93,7 @@ public class CategoryController {
 			){
 		
 		return new ResponseEntity<>(
-				categoryService.getCategoryPosts(categoryId, page, pageSize, sortBy, sortDir), HttpStatus.OK
+				categoryService.getCategoryPosts(categoryName, page, pageSize, sortBy, sortDir), HttpStatus.OK
 				);
 	}
 }
