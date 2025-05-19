@@ -7,6 +7,7 @@ $(document).ready(function () {
 
   async function loadCurrentUser() {
     let currentUser = localStorage.getItem(`user`);
+    const accessToken = Cookies.get(`access_token`);
 
     if (currentUser) {
       return Promise.resolve(JSON.parse(currentUser));
@@ -14,25 +15,25 @@ $(document).ready(function () {
 
     return await $.ajax({
       method: "GET",
-      url: "http://localhost:8080/api/users/me",
-      headers: {'Authorization': 'Bearer ' + data.accessToken}})
-      .then((user) => {
-        const localStorageUser = {
-          publicId: user.publicId,
-          profileImgUrl: user.profileImgUrl,
-          firstName: user.firstName,
-          lastName: user.lastName,
-        }
-        localStorage.setItem(`user`, JSON.stringify(localStorageUser));
+      url: `http://${host}/api/users/me`,
+      headers: { 'Authorization': 'Bearer ' + accessToken }
+    }).then((user) => {
+      const localStorageUser = {
+        publicId: user.publicId,
+        profileImgUrl: user.profileImgUrl,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      }
+      localStorage.setItem(`user`, JSON.stringify(localStorageUser));
 
-        return localStorageUser;
-      }).catch(function(response) {
-        if (response.responseJSON) {
-          console.error(response.responseJSON.message);
-        } else {
-          console.error(`An error occurred while sending the request, please try again later`)
-        }
-      });
+      return localStorageUser;
+    }).catch(function (response) {
+      if (response.responseJSON) {
+        console.error(response.responseJSON.message);
+      } else {
+        console.error(`An error occurred while sending the request, please try again later`)
+      }
+    });
   }
 
   async function loadTags() {
@@ -59,31 +60,46 @@ $(document).ready(function () {
   }
 
 
-  loadCurrentUser().then(user => {
-    
-    const profilePictureURL = $(`.profile-details .profile-pic img`);
-    const userFullName = $(`.profile-details .user-name`);
-    const downArrow = $(`<i class="fa fa-caret-down"></i>`);
-    
-    profilePictureURL.attr(`src`, `http://${host}` + user.profileImgUrl);
+  if (Cookies.get(`access_token`)) {
+    loadCurrentUser().then(user => {
 
-    userFullName.text(`${user.firstName} ${user.lastName}`);
+      $(`.profile-details`).data(`user-id`, user.publicId);
+      const profilePictureURL = $(`.profile-details .profile-pic img`);
+      const userFullName = $(`.profile-details .user-name`);
+      const downArrow = $(`<i class="fa fa-caret-down"></i>`);
 
-    userFullName.append(downArrow);
-  })
+      if (user.profileImgUrl) {
+        profilePictureURL.attr(`src`, `http://${host}${user.profileImgUrl}`);
+      } else {
+        profilePictureURL.attr(`src`, '../static/images/navbar_default_profile_pic.png');
+      }
+
+      profilePictureURL.on(`error`, function () {
+        const defaultSrc = '../static/images/navbar_default_profile_pic.png';
+        if ($(this).attr('src') !== defaultSrc) {
+          $(this).attr('src', defaultSrc);
+        }
+      });
+
+
+      userFullName.text(`${user.firstName} ${user.lastName}`);
+
+      userFullName.append(downArrow);
+    });
+  }
 
   loadTags().then(tags => {
     tags.forEach(tag => {
       const AlltagCheckBoxes = $(`.tag-checkboxes`);
 
       const tagLabel = $(`<label class="tag-dropdown-item"></label>`);
-      tagLabel.attr('data-id', tag.id);
+      tagLabel.data('tag-name', tag.name.toLowerCase());
 
       const tagCheckBox = $(`<input type="checkbox">`);
       tagCheckBox.val(tag.name);
 
       tagLabel.append(tagCheckBox).append(tag.name);
-      
+
 
       AlltagCheckBoxes.append(tagLabel);
     });
@@ -115,35 +131,40 @@ $(document).ready(function () {
   loadCategories().then(categories => {
     categories.forEach(category => {
       const categoryDropdownList = $(`.category-dropdown`);
-      const categoryItem = $(`<span class="category-item">${category.name}</span>`);
+      const categoryItem = $(`<a class="category-item">${category.name}</a>`);
       const categoryDropdownListItem = $(`<li></li>`);
 
-      categoryItem.attr(`data-id`, category.id);
+      categoryItem.data(`category-name`, category.name.toLowerCase());
+      categoryItem.attr(`href`, `home.html?category=${encodeURIComponent(category.name.toLowerCase())}`)
       categoryItem.text(category.name);
 
       categoryDropdownListItem.append(categoryItem);
 
       categoryDropdownList.append(categoryDropdownListItem);
     })
-  })
+  });
+
+  window.loadTags = loadTags;
+  window.loadCategories = loadCategories;
 
   const accessToken = Cookies.get(`access_token`);
+
   if (!accessToken) {
     $('.user-profile').hide();
     $(`.mobile-view-logout-btn`).hide();
     $(`.login-signup-btn`).css(`display`, `flex`);
   } else {
     $('.user-profile').show();
+    $(`.publish-btn`).show();
   }
 
   const mainWrapper = $(`body main`);
   const navButtons = $(`.navbar-buttons`);
-  const leftNavButtons = $(`.nav-left-buttons`);
-  const navbarSearch = $(`.search-container`);
+  const publishButton = $(`.publish-btn`);
 
 
   if (window.innerWidth <= 900) {
-    mainWrapper.prepend(navbarSearch);
+    navButtons.append(publishButton);
   }
 
   $(window).on(`resize`, function () {
@@ -151,16 +172,23 @@ $(document).ready(function () {
     if (window.innerWidth > 900) {
 
       $(`.navbar-buttons`).css(`display`, `flex`);
-      $(`.search-container`).css(`display`, `flex`);
+      $(`.user-profile`).prepend(publishButton);
 
-      if (navButtons.has(navbarSearch).length === 0) {
-        leftNavButtons.after(navbarSearch);
-      }
     } else {
-      if (mainWrapper.has(navbarSearch).length === 0) {
-        mainWrapper.prepend(navbarSearch);
-      }
+
+      navButtons.append(publishButton)
+
     }
+  });
+
+
+  $(`.nav-left-buttons li`).on(`click`, function () {
+
+    $(`.nav-left-buttons li`).not($(this)).removeClass(`active`);
+    if (!$(this).hasClass(`viiew-search-btn`)) {
+      $(`.search-container`).hide();
+    }
+
   });
 
   const tagSearch = $(`.tag-search`);
@@ -171,11 +199,26 @@ $(document).ready(function () {
     tagSearch.val(``)
   });
 
-  $(`.mobile-view-search-btn`).on(`click`, function () {
-    $(`.search-container`).css(`display`, `flex`);
-    $(`.main-search-input`).focus();
-    $(`.navbar-buttons`).hide();
-    $(`.menu-bar`).removeClass(`active`);
+  $(`.view-search-btn`).on(`click`, function () {
+    $(this).toggleClass(`active`);
+
+    if (window.innerWidth <= 900) {
+      $(`.navbar-buttons`).hide();
+      $(`.menu-bar`).removeClass(`active`);
+    }
+
+    if ($(this).hasClass(`active`)) {
+      $(`.search-container`).show();
+      $(`.main-search-input`).focus();
+    } else {
+      $(`.search-container`).hide();
+    }
+
+  });
+
+  $(`.close-search-btn`).on(`click`, function () {
+    $(`.search-container`).hide();
+    $(`.view-search-btn`).removeClass(`active`);
   });
 
   tagSearch.on(`keyup`, function () {
@@ -212,7 +255,15 @@ $(document).ready(function () {
       } else {
         $(`.profile-dropdown`).hide();
       }
+    } else {
+      window.location = `user_profile.html?id=${decodeURIComponent($(this).data(`user-id`))}`;
     }
+  });
+
+  $(`.view-profile`).on(`click`, function () {
+    currentUserId = $(this).closest(`.user-profile`).find(`.profile-details`).data(`user-id`);
+
+    window.location = `user_profile.html?id=${currentUserId}`;
   });
 
   $(`.category-details`).on(`click`, function () {
@@ -250,20 +301,15 @@ $(document).ready(function () {
         menuBar.classList.remove(`active`);
         navbarButtons.style.display = `none`;
       }
-
-      const modileViewSearchBtn = document.querySelector(`.mobile-view-search-btn`);
-      const searchContainer = document.querySelector(`.search-container`);
-      if (!searchContainer.contains(e.target) && e.target !== modileViewSearchBtn) {
-        searchContainer.style.display = `none`;
-      }
     }
+
   });
 
   const mainSearchButton = $(`.search-container .fa-search`);
   mainSearchButton.on(`click`, function () {
     const searchQuery = $(`.main-search-input`).val().trim();
 
-    const tags = [];
+    let tags = [];
 
     const checkboxes = $(`.tag-dropdown-item input`).toArray();
 
@@ -272,10 +318,11 @@ $(document).ready(function () {
         tags.push(checkbox.value);
       }
     });
-    
-    // search.html, search.css, and search.js will be implemented soon
-    window.location = `search.html?query=${searchQuery}&tags=${tags.join(`,`)}`;
-    
+
+    tags = tags.map(tag => encodeURIComponent(tag));
+
+    window.location = `home.html?search=${encodeURIComponent(searchQuery)}&tags=${tags.join(`,`)}`;
+
   });
 
   $(`.search-container .main-search-input`).on(`keyup`, function (e) {
@@ -285,11 +332,10 @@ $(document).ready(function () {
     }
   })
 
-
   $(`.logout-btn`).on(`click`, logout);
   $(`.mobile-view-logout-btn`).on(`click`, logout);
 
-  function logout () {
+  function logout() {
     const accessToken = Cookies.get(`access_token`);
     const refreshToken = Cookies.get(`refresh_token`);
 
@@ -302,12 +348,12 @@ $(document).ready(function () {
       url: `http://${host}/api/auth/logout`,
       data: JSON.stringify(reqData),
       contentType: `application/json`,
-      headers: {'Authorization': `Bearer ${accessToken}`},
+      headers: { 'Authorization': `Bearer ${accessToken}` },
       success: function (data) {
         console.log("SUCCESS")
         Cookies.remove(`access_token`);
         Cookies.remove(`refresh_token`);
-        
+
         window.location = `login.html`;
       },
       error: function (response) {

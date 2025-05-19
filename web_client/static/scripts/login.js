@@ -77,9 +77,10 @@ $(document).ready(function () {
       data: JSON.stringify(userData),
       contentType: 'application/json',
       success: (data) => {
-        
-        Cookies.set('access_token',  data.accessToken);
-        Cookies.set('refresh_token', data.refreshToken);
+        const inTenMinutes = new Date(Date.now() + 600000);
+
+        Cookies.set('access_token',  data.accessToken, {expires: inTenMinutes, path: `/`});
+        Cookies.set('refresh_token', data.refreshToken, {expires: 10, path: `/`});
         
         $.ajax({
           method: "GET",

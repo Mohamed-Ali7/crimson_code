@@ -1,7 +1,24 @@
 $(document).ready(function () {
   const host = `192.168.1.2:8080`;
+  let requestURL = `http://${host}/api/posts?`;
 
   const urlParams = new URLSearchParams(window.location.search);
+
+  const searchParam = urlParams.get(`search`);
+  const searchTagsParam = urlParams.get(`tags`);
+
+  const tagParam = urlParams.get(`tag`);
+  const categoryParam = urlParams.get(`category`);
+
+  if (searchParam || searchTagsParam) {
+    const encodedSearchParam = encodeURIComponent(searchParam);
+    const encodedSearchTagsParam =  encodeURIComponent(searchTagsParam)
+    requestURL = `http://${host}/api/posts/search?query=${(encodedSearchParam)}&tags=${encodedSearchTagsParam}&`;
+  } else if (tagParam) {
+    requestURL = `http://${host}/api/tags/${encodeURIComponent(tagParam)}/posts?`;
+  } else if (categoryParam) {
+    requestURL = `http://${host}/api/categories/${encodeURIComponent(categoryParam)}/posts?`;
+  }
 
   const page = urlParams.get(`page`) ? urlParams.get(`page`) : 1;
   const size = urlParams.get(`size`) ? urlParams.get(`size`) : 9;
@@ -10,7 +27,7 @@ $(document).ready(function () {
 
   $.ajax({
     method: `GET`,
-    url: `http://${host}/api/posts?page=${page}&size=${size}&sort_by=${sortBy}&sort_dir=${sortDir}`,
+    url: `${requestURL}page=${page}&size=${size}&sort_by=${sortBy}&sort_dir=${sortDir}`,
     success: function (postsPage) {
       postsPage.content.forEach(post => {
 
@@ -46,6 +63,8 @@ $(document).ready(function () {
 
         const user = post.user;
 
+        authorInfoContainer.data(`user-id`, user.publicId);
+
         if (user.profileImgUrl) {
           authorAvatar.attr(`src`, `http://${host}${user.profileImgUrl}`);
         } else {
@@ -64,13 +83,15 @@ $(document).ready(function () {
         const postCategory = $(`<span class="post-category"></span>`);
 
         const category = post.category;
-        postCategory.data(`category-id`, category.id);
+        postCategory.data(`category-name`, category.name.toLowerCase());
         postCategory.text(category.name);
 
-        const postTags = $(`<div class="post-tags"></div>`);
+        const postTags = $(`<div class="post-tags-list"></div>`);
 
         post.tags.forEach(tag => {
-          const tagSpan = $(`<span class="tag">${tag.name}</span>`).data(`tag-id`, tag.id);
+          const tagSpan = $(`<span class="post-tag">${tag.name.toLowerCase()}</span>`)
+            .data(`tag-name`, tag.name.toLowerCase());
+
           postTags.append(tagSpan);
         })
 
@@ -100,8 +121,38 @@ $(document).ready(function () {
     }
   });
 
+  $(document).on(`click`, `.author-name`, showUser);
+
+  $(document).on(`click`, `.author-avatar`, showUser);
+
+  function showUser() {
+    const authorId = $(this).closest(`.author-info-container`).data(`user-id`);
+
+    const encodedAuthorId = encodeURIComponent(authorId);
+    window.location = `user_profile.html?id=${encodedAuthorId}`;
+  }
+
+  $(document).on(`click`, `.post-category`, function () {
+    const encodedCategory = encodeURIComponent($(this).data(`category-name`));
+    window.location = `home.html?category=${encodedCategory}`;
+  });
+
+  $(document).on(`click`, `.post-tags-list .post-tag`, function () {
+    const encodedTag = encodeURIComponent($(this).data(`tag-name`));
+    window.location = `home.html?tag=${encodedTag}`;
+  });
+
   $(document).on('click', '.pagination-controls button', function () {
-    window.location = `home.html?page=${$(this).text()}`;
+    if (searchParam || searchTagsParam) {
+      window.location = `home.html?query=${searchParam}&tags=${searchTagsParam}&page=${$(this).text()}`;
+    } else if (tagParam) {
+      window.location = `home.html?tag=${tagParam}&page=${$(this).text()}`;
+    } else if (categoryParam) {
+      window.location = `home.html?category=${categoryParam}&page=${$(this).text()}`;
+    }
+    else {
+      window.location = `home.html?page=${$(this).text()}`;
+    }
   });
 
   function renderPagination(currentPage, totalPages) {

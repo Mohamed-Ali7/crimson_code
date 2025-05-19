@@ -1,9 +1,18 @@
 $(document).ready(function () {
 
   const host = `192.168.1.2:8080`;
+  const accessToken = Cookies.get(`access_token`);
+
   const urlParams = new URLSearchParams(window.location.search);
   const postId = urlParams.get(`id`);
   const isEditMode = urlParams.get(`edit`) && postId;
+
+
+  if (!accessToken) {
+    $(`#post-form`).hide();
+    $(`.login-prompt`).show();
+    return;
+  }
 
   let apiRequestUrl = `http://${host}/api/posts`;
   let apiRequestMethod = `POST`;
@@ -15,18 +24,21 @@ $(document).ready(function () {
 
   const existedTags = new Set();
   const selectedTags = new Set();
-  const categories = JSON.parse(sessionStorage.getItem(`categories`));
-  const sessionTags = JSON.parse(sessionStorage.getItem(`tags`));
+  const categories = loadCategories(); // from common.js file
+  const sessionTags = loadTags(); // from common.js file
 
   const postCategoryDropdown = $(`.post-category-dropdown`);
 
   if (categories) {
-    categories.forEach(category => {
-      const categorySpan = $(`<span class="post-category-dropdown-item"></span>`);
-      categorySpan.data(`category-id`, category.id);
-      categorySpan.text(category.name);
+    categories.then(categoryList => {
+      categoryList.forEach(category => {
+        const categorySpan = $(`<span class="post-category-dropdown-item"></span>`);
+        categorySpan.data(`category-id`, category.id);
+        categorySpan.text(category.name);
 
-      postCategoryDropdown.append(categorySpan);
+        postCategoryDropdown.append(categorySpan);
+      })
+
     });
   }
 
@@ -41,7 +53,7 @@ $(document).ready(function () {
     }
   });
 
-  $(`.post-category-dropdown-item`).on(`click`, function () {
+  $(document).on(`click`, `.post-category-dropdown-item`, function () {
 
     $(`.post-category-dropdown`).hide();
     $(`.post-category-container`).removeClass(`expand`)
@@ -93,7 +105,6 @@ $(document).ready(function () {
         post.tags.forEach(tag => {
           selectedTags.add(tag.name.toLowerCase());
 
-
           const tagElement = $(`
           <span class="existed-tag-item">
             ${tag.name.toLowerCase()}
@@ -104,10 +115,12 @@ $(document).ready(function () {
         });
 
         if (sessionTags) {
-          sessionTags.forEach(existedTag => {
-            if (!selectedTags.has(existedTag.name.toLowerCase())) {
-              addExistedTags(existedTag);
-            }
+          sessionTags.then(sessionTagsList => {
+            sessionTagsList.forEach(existedTag => {
+              if (!selectedTags.has(existedTag.name.toLowerCase())) {
+                addExistedTags(existedTag);
+              }
+            });
           });
         }
       },
@@ -121,8 +134,8 @@ $(document).ready(function () {
     });
   } else {
     if (sessionTags) {
-      sessionTags.forEach(tag => {
-        addExistedTags(tag);
+      sessionTags.then(tagList => {
+        tagList.forEach(tag => addExistedTags(tag));
       });
     }
   }
@@ -290,12 +303,16 @@ $(document).ready(function () {
 
   function showImagePreview(file) {
     const reader = new FileReader();
-    reader.onload = function (e) {
-      imagePreview.html(`<img src="${e.target.result}" alt="Image Preview" />`);
-      imagePreview.css(`padding`, 0);
-      imagePreview.css(`border`, `none`)
-    };
-    reader.readAsDataURL(file);
+    const isValid = isPostImageValid(file);
+    if (isValid) {
+      reader.onload = function (e) {
+        imagePreview.html(`<img src="${e.target.result}" alt="Image Preview" />`);
+        imagePreview.css(`padding`, 0);
+        imagePreview.css(`border`, `none`)
+      };
+      reader.readAsDataURL(file);
+    }
+
   }
 
   $(`#post-title`).on('input', function () {
@@ -316,12 +333,12 @@ $(document).ready(function () {
 
   function resizeTextarea(textarea) {
 
-  const scrollTop = window.scrollY;
-  textarea.style.height = '5rem';
-  textarea.style.height = textarea.scrollHeight + 'px';
-  window.scrollTo({ top: scrollTop });
+    const scrollTop = window.scrollY;
+    textarea.style.height = '5rem';
+    textarea.style.height = textarea.scrollHeight + 'px';
+    window.scrollTo({ top: scrollTop });
 
-}
+  }
 
   $(`#post-form`).on(`submit`, function (e) {
 
@@ -360,8 +377,6 @@ $(document).ready(function () {
     if (postImage) {
       formData.append(`postImage`, postImage);
     }
-
-    const accessToken = Cookies.get(`access_token`);
 
     $.ajax({
       method: apiRequestMethod,
@@ -431,6 +446,19 @@ $(document).ready(function () {
       return false;
     }
 
+    return true;
+  }
+
+  function isPostImageValid(image) {
+    if (image.size > 2 * 1024 * 1024) { // 2MB
+      $(`.image-preview`).addClass(`error`);
+      $(`.image-upload-wrapper`).next(`.error-message`).css(`visibility`, `visible`)
+        .text(`File size exceeds 2MB limit. Please choose a smaller image.`);
+      return false;
+    }
+
+    $(`.image-preview`).removeClass(`error`);
+     $(`.image-upload-wrapper`).next(`.error-message`).css(`visibility`, `hidden`);
     return true;
   }
 

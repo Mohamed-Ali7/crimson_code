@@ -69,9 +69,12 @@ $(document).ready(async function () {
       $('.post-title').text(post.title);
       $('.post-content').html(postContent);
       const user = post.user;
-      $('.author-name').text(`${user.firstName} ${user.lastName}`).data(`user-id`, user.publicId);
 
-      const userAvatar = $('.author-avatar');
+      $('.post-author-name').text(`${user.firstName} ${user.lastName}`).data(`user-id`, user.publicId);
+
+      $(`.post-author-box`).data(`user-id`, user.publicId);
+
+      const userAvatar = $('.post-author-avatar');
 
       if (user.profileImgUrl) {
         userAvatar.attr(`src`, `http://${host}${user.profileImgUrl}`);
@@ -92,7 +95,7 @@ $(document).ready(async function () {
 
       const postCategory = $('.post-category');
       postCategory.text(post.category.name);
-      postCategory.data(`category-id`, post.category.id);
+      postCategory.data(`category-name`, post.category.name.toLowerCase());
 
       if (post.imageUrl) {
         $('.post-image').attr('src', `http://${host}${post.imageUrl}`);
@@ -101,8 +104,8 @@ $(document).ready(async function () {
       }
 
       post.tags.forEach(tag => {
-        const tagElement = $(`<span class="tag">${tag.name.toLowerCase()}</span>`);
-        tagElement.data(`tag-id`, tag.id);
+        const tagElement = $(`<span class="post-tag">${tag.name.toLowerCase()}</span>`);
+        tagElement.data(`tag-name`, tag.name.toLowerCase());
         $('.tag-list').append(tagElement);
       });
 
@@ -199,6 +202,7 @@ $(document).ready(async function () {
 
     const commentMeta = $('<div class="comment-meta"></div>');
     const commentAuthorBox = $('<div class="comment-author-box"></div>');
+    commentAuthorBox.data(`user-id`, commentAuthor.publicId);
 
     const commentButtonsConatiner = $('<div class="comment-buttons-container"></div>');
 
@@ -450,39 +454,39 @@ $(document).ready(async function () {
 
   });
 
-  $(document).on(`click`, `.author-name`, showUser);
-  $(document).on(`click`, `.author-avatar`, showUser);
-  $(document).on(`click`, `.comment-author-name`, showUser);
-  $(document).on(`click`, `.comment-author-avatar`, showUser);
+  $(document).on(`click`, `.post-author-name`, function () {
+    const authorId = $(this).closest(`.post-author-box`).data(`user-id`);
+    window.location = `user_profile.html?id=${encodeURIComponent(authorId)}`;
+  });
 
-  function showUser() {
-    const userId = $(this).data(`user-id`);
-    $.ajax({
-      method: `GET`,
-      url: `http://${host}/api/users/${userId}`,
-      success: function (user) {
-        window.location = `user_profile.html?id=${userId}`;
-      },
-      error: function (response) {
-        if (response.responseJSON) {
-          console.error(response.responseJSON.message);
-        } else {
-          console.error(`An error occurred while sending the request, please try again later`)
-        }
-      }
-    });
-  }
+  $(document).on(`click`, `.post-author-avatar`, function () {
+    const authorId = $(this).closest(`.post-author-box`).data(`user-id`);
+    window.location = `user_profile.html?id=${encodeURIComponent(authorId)}`;
+  });
+
+  $(document).on(`click`, `.comment-author-name`, function () {
+    const authorId = $(this).closest(`.comment-author-box`).data(`user-id`);
+    window.location = `user_profile.html?id=${encodeURIComponent(authorId)}`;
+  });
+
+  $(document).on(`click`, `.comment-author-avatar`, function () {
+    const authorId = $(this).closest(`.comment-author-box`).data(`user-id`);
+    window.location = `user_profile.html?id=${encodeURIComponent(authorId)}`;
+  });
+
 
   $(`.post-image`).on(`click`, function () {
     window.open($(this).attr('src'), '_blank');
   });
 
   $(`.post-category`).on(`click`, function () {
-    window.location = `filtered_posts.html?category-id=${$(this).data(`category-id`)}`
+    const encodedCategory = encodeURIComponent($(this).data(`category-name`));
+    window.location = `home.html?category=${encodedCategory}`;
   });
 
-  $(document).on(`click`, `.tag-meta-section .tag-list .tag`, function () {
-    window.location = `filtered_posts.html?tag-id=${$(this).data(`tag-id`)}`
+  $(document).on(`click`, `.tag-meta-section .tag-list .post-tag`, function () {
+    const encodedTag = encodeURIComponent($(this).data(`tag-name`));
+    window.location = `home.html?tag=${encodedTag}`;
   });
 
   function renderCommentsPagination(currentPage, totalPages) {

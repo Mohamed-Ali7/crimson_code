@@ -28,81 +28,96 @@
       <img src="../static/images/crimson_code_logo.png">
     </div>
 
-      <i class="fas fa-bars menu-bar"></i>
 
-      <div class="navbar-buttons">
-        <ul class="nav-left-buttons">
-          <li class="home-btn">
+
+    <i class="fas fa-bars menu-bar"></i>
+
+    <div class="navbar-buttons">
+      <ul class="nav-left-buttons">
+        <li class="home-btn">
+          <a href="home.html">
             <i class="fas fa-home"></i>
             Home
-          </li>
+          </a>
+        </li>
 
-          <li class="categories-btn">
+        <li class="categories-btn">
 
-            <div class="category-details">
-              <i class="fas fa-layer-group"></i>
-              <span>Categories</span>
-            </div>
-
-            <ul class="category-dropdown">
-              
-            </ul>
-          </li>
-        </ul>
-
-        <div class="mobile-view-search-btn">
-          <i class="fas fa-search"></i></i>
-          Search
-        </div>
-
-        <div class="mobile-view-logout-btn">
-          <i class="fas fa-sign-out-alt fa-flip-horizontal"></i>
-          Logout
-        </div>
-
-        <div class="search-container">
-
-          <div class="tag-dropdown">
-            <button id="tag-dropdown-btn">Tags <i class="bi bi-caret-down-fill"></i></button>
-            <div class="tag-dropdown-content">
-              <input type="text" class="tag-search" placeholder="Search tags..." />
-              <div class="tag-checkboxes">
-
-              </div>
-            </div>
+          <div class="category-details">
+            <i class="fas fa-layer-group"></i>
+            <span>Categories</span>
           </div>
 
-          <input class="main-search-input" type="search" placeholder="Search..." />
-          <i class="fas fa-search"></i>
-        </div>
+          <ul class="category-dropdown">
 
-        <ul class="nav-right-buttons">
-          <li class="login-signup-btn">
-            <button class="navbar-login-btn">
-              <i class="fas fa-sign-in-alt"></i>
-              Login
-            </button>
+          </ul>
+        </li>
 
-            <button class="navbar-signup-btn">
-              <i class="bi bi-person-plus-fill"></i>
-              Sign Up
-            </button>
-          </li>
+        <li class="view-search-btn">
+          <i class="fas fa-search"></i></i>
+          Search
+        </li>
+      </ul>
 
-        </ul>
-        <ul class="user-profile">
-          <li class="profile-details">
-            <div class="profile-pic">
-              <img src="" alt="" />
-            </div>
-            <span class="user-name"></span>
-          </li>
-          <li class="profile-dropdown">
-            <button class="view-profile">View Profile</button>
-            <button class="logout-btn">Logout</button>
-          </li>
-        </ul>
+
+
+      <div class="mobile-view-logout-btn">
+        <i class="fas fa-sign-out-alt fa-flip-horizontal"></i>
+        Logout
       </div>
+
+
+
+      <ul class="nav-right-buttons">
+        <li class="login-signup-btn">
+          <button class="navbar-login-btn">
+            <i class="fas fa-sign-in-alt"></i>
+            Login
+          </button>
+
+          <button class="navbar-signup-btn">
+            <i class="bi bi-person-plus-fill"></i>
+            Sign Up
+          </button>
+        </li>
+
+      </ul>
+      <ul class="user-profile" style="display: none;">
+        <li class="publish-btn" style="display: none;">
+          <a href="post_form.html">
+            <i class="fas fa-pencil-alt"></i>
+            Publish
+          </a>
+        </li>
+
+        <li class="profile-details">
+          <div class="profile-pic">
+            <img src="" alt="" />
+          </div>
+          <span class="user-name"></span>
+        </li>
+        <li class="profile-dropdown">
+          <button class="view-profile">View Profile</button>
+          <button class="logout-btn">Logout</button>
+        </li>
+      </ul>
+    </div>
+    <div class="search-container" style="display: none;">
+
+      <div class="tag-dropdown">
+        <button id="tag-dropdown-btn">Tags <i class="bi bi-caret-down-fill"></i></button>
+        <div class="tag-dropdown-content">
+          <input type="text" class="tag-search" placeholder="Search tags..." />
+          <div class="tag-checkboxes">
+
+          </div>
+        </div>
+      </div>
+
+      <input class="main-search-input" type="search" placeholder="Search..." />
+      <i class="fas fa-search"></i>
+      <button class="close-search-btn">&times;</button>
+    </div>
   </header>
   
   <main class="verification-request-wrapper">
