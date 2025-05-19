@@ -12,6 +12,6 @@ public interface TagService {
 	PageResponseModel<TagResponseModel> getAllTags(int page, int pageSize, String sortBy, String sortDir);
 	TagResponseModel updateTag(long tagId, TagRequestModel tagRequest);
 	void deleteTag(long id);
-	PageResponseModel<PostResponseModel> getTagPosts(long tagId, int page, int pageSize,
+	PageResponseModel<PostResponseModel> getTagPosts(String tagName, int page, int pageSize,
 			String sortBy, String sortDir);
 }

@@ -12,6 +12,6 @@ public interface CategoryService {
 	PageResponseModel<CategoryResponseModel> getAllCategories(int page, int pageSize, String sortBy, String sortDir);
 	CategoryResponseModel updateCategory(long id, CategoryRequestModel categoryRequest);
 	void deleteCategory(long categoryId);
-	PageResponseModel<PostResponseModel> getCategoryPosts(long categoryId, int page, int pageSize,
+	PageResponseModel<PostResponseModel> getCategoryPosts(String categoryName, int page, int pageSize,
 			String sortBy, String sortDir);
 }

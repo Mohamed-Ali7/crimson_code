@@ -81,8 +81,8 @@ public class TagController {
 		return operationStatus;
 	}
 	
-	@GetMapping("/{tagId}/posts")
-	public ResponseEntity<PageResponseModel<PostResponseModel>> getTagPosts(@PathVariable long tagId,
+	@GetMapping("/{tagName}/posts")
+	public ResponseEntity<PageResponseModel<PostResponseModel>> getTagPosts(@PathVariable String tagName,
 			@RequestParam(name = "page", defaultValue = "0") int page,
 			@RequestParam(name = "size", defaultValue = "15") int pageSize,
 			@RequestParam(name = "sort_by", defaultValue = "createdAt") String sortBy,
@@ -90,7 +90,7 @@ public class TagController {
 			){
 		
 		return new ResponseEntity<>(
-				tagService.getTagPosts(tagId, page, pageSize, sortBy, sortDir), HttpStatus.OK);
+				tagService.getTagPosts(tagName, page, pageSize, sortBy, sortDir), HttpStatus.OK);
 	}
 	
 }
