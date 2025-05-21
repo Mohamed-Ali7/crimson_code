@@ -8,6 +8,12 @@ $(document).ready(async function () {
   let currentUserPublicId;
   let isAdmin = false;
 
+  const containsAlphabet = /[a-zA-Z]/.test(postId);
+
+  if (!postId || containsAlphabet) {
+    window.location = `not_found.html`;
+  }
+
   if (accessToken) {
     const decodedJwtToken = decodeJwt(accessToken);
     currentUserPublicId = decodedJwtToken.userPublicId;
@@ -116,10 +122,14 @@ $(document).ready(async function () {
       loadComments(1);
     },
     error: function (response) {
-      if (response.responseJSON) {
-        console.error(response.responseJSON.message);
+      if (response.status === 404) {
+        window.location = `not_found.html`;
       } else {
-        console.error(`An error occurred while sending the request, please try again later`)
+        if (response.responseJSON) {
+          console.error(response.responseJSON.message);
+        } else {
+          console.error(`An error occurred while sending the request, please try again later`)
+        }
       }
     }
   });
@@ -412,7 +422,7 @@ $(document).ready(async function () {
 
     const currentComment = $(this).closest(`.comment-wrapper`);
     const currentCommentId = currentComment.data(`comment-id`);
- 
+
     Swal.fire({
       title: 'Are you sure?',
       text: "This comment will be permanently deleted!",

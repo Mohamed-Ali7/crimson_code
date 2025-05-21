@@ -33,7 +33,7 @@
 }
 
 .post-card {
-  background-color: #f5f5f5;
+  background-color: #ffffff;
   border-radius: 12px;
   overflow: hidden;
   color: #161616;
@@ -62,9 +62,9 @@
 }
 
 .post-title {
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   margin: 0;
-  height: 3.4rem;
+  height: 3.7rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -119,7 +119,7 @@
   background-color: #9E1B32;
   padding: 0.35rem 0.6rem;
   border-radius: 4px;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   cursor: pointer;
   color: #ffffff;
   margin-top: 1rem;

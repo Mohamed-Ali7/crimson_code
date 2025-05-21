@@ -350,9 +350,9 @@ $(document).ready(function () {
       contentType: `application/json`,
       headers: { 'Authorization': `Bearer ${accessToken}` },
       success: function (data) {
-        console.log("SUCCESS")
         Cookies.remove(`access_token`);
         Cookies.remove(`refresh_token`);
+        localStorage.removeItem(`user`);
 
         window.location = `login.html`;
       },
