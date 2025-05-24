@@ -36,6 +36,10 @@ $(document).ready(function () {
     });
   }
 
+  $(`.logo`).on(`click`, function () {
+    window.location = `index.html`;
+  });
+
   async function loadTags() {
     let tags = sessionStorage.getItem(`tags`);
     if (tags) {

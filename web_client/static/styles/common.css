@@ -481,8 +481,12 @@ body {
 
 @media (max-width: 900px) {
 
+  header.navbar {
+    padding: 0 1.4rem;
+  }
+  
   .logo {
-    margin-left: -2rem;
+    margin-left: -1.5rem;
   }
 
   .search-container {
