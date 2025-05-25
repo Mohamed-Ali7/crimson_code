@@ -1,4 +1,17 @@
-$(document).ready(function () {
+$(document).ready(async function () {
+  await window.initCommen();
+  const host = `http://192.168.1.2:8080`;
+
+  if (Cookies.get(`access_token`)) {
+    $.ajax({
+      method: "GET",
+      url: `${host}/api/users/me`,
+      headers: { 'Authorization': 'Bearer ' + Cookies.get(`access_token`) },
+      success: () => {
+        window.location = `home.html`
+      }
+    });
+  }
 
   const flushMessage = sessionStorage.getItem(`flush_message`);
   if (flushMessage) {
@@ -73,21 +86,20 @@ $(document).ready(function () {
 
     $.ajax({
       method: "POST",
-      url: "http://192.168.1.2:8080/api/auth/login",
+      url: `${host}/api/auth/login`,
       data: JSON.stringify(userData),
       contentType: 'application/json',
       success: (data) => {
-        const inTenMinutes = new Date(Date.now() + 600000);
 
-        Cookies.set('access_token',  data.accessToken, {expires: inTenMinutes, path: `/`});
-        Cookies.set('refresh_token', data.refreshToken, {expires: 10, path: `/`});
-        
+        Cookies.set('access_token', data.accessToken, { expires: 10, path: `/` });
+        Cookies.set('refresh_token', data.refreshToken, { expires: 10, path: `/` });
+
         $.ajax({
           method: "GET",
-          url: "http://192.168.1.2:8080/api/users/me",
-          headers: {'Authorization': 'Bearer ' + data.accessToken},
+          url: `${host}/api/users/me`,
+          headers: { 'Authorization': 'Bearer ' + data.accessToken },
           success: (user) => {
-            
+
             const localStorageUser = {
               publicId: user.publicId,
               profileImgUrl: user.profileImgUrl,
@@ -96,7 +108,7 @@ $(document).ready(function () {
             }
             localStorage.setItem(`user`, JSON.stringify(localStorageUser));
           },
-          error: function(response) {
+          error: function (response) {
             if (response.responseJSON) {
               console.error(response.responseJSON.message);
             } else {
@@ -111,8 +123,8 @@ $(document).ready(function () {
       error: (response) => {
         if (response.status === 403) {
           $(`.flush-message`).css(`background-color`, `#9E1B32`)
-          .text(`Your email is not verified. Please check your inbox or resend the verification email.`)
-          .show();
+            .text(`Your email is not verified. Please check your inbox or resend the verification email.`)
+            .show();
           return;
         }
         console.error(response.responseJSON.message);

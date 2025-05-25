@@ -1,5 +1,18 @@
-$(document).ready(function () {
+$(document).ready(async function () {
 
+  await window.initCommen();
+
+  const host = `http://192.168.1.2:8080`;
+  if (Cookies.get(`access_token`)) {
+    $.ajax({
+      method: "GET",
+      url: `${host}/api/users/me`,
+      headers: { 'Authorization': 'Bearer ' + Cookies.get(`access_token`) },
+      success: () => {
+        window.location = `home.html`;
+      }
+    });
+  }
 
   function showError(inputField, message) {
     inputField.addClass('error');

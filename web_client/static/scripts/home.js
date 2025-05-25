@@ -1,4 +1,6 @@
-$(document).ready(function () {
+$(document).ready(async function () {
+  await window.initCommen();
+
   const host = `192.168.1.2:8080`;
   let requestURL = `http://${host}/api/posts?`;
 
@@ -144,7 +146,7 @@ $(document).ready(function () {
 
   $(document).on('click', '.pagination-controls button', function () {
     if (searchParam || searchTagsParam) {
-      window.location = `home.html?query=${searchParam}&tags=${searchTagsParam}&page=${$(this).text()}`;
+      window.location = `home.html?search=${searchParam}&tags=${searchTagsParam}&page=${$(this).text()}`;
     } else if (tagParam) {
       window.location = `home.html?tag=${tagParam}&page=${$(this).text()}`;
     } else if (categoryParam) {

@@ -19,6 +19,7 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
 
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -119,20 +120,24 @@
       <button class="close-search-btn">&times;</button>
     </div>
   </header>
-  
+
   <div class="main-wrapper">
     <h1>About Crimson Code</h1>
     <p>
-      <strong>Crimson code</strong> is a curated blog platform created for developers, students, and technology enthusiasts who are passionate about learning and sharing knowledge.
+      <strong>Crimson code</strong> is a curated blog platform created for developers, students, and technology
+      enthusiasts who are passionate about learning and sharing knowledge.
     </p>
     <p>
-      We publish high-quality articles that explore the real-world applications of software engineering, web development, tools, frameworks, and everything in between. Every post is crafted with clarity and technical accuracy in mind.
+      We publish high-quality articles that explore the real-world applications of software engineering, web
+      development, tools, frameworks, and everything in between. Every post is crafted with clarity and technical
+      accuracy in mind.
     </p>
     <p>
-      Our goal is to build a trustworthy community where people can find and contribute valuable insights — whether you’re just getting started or you’ve been in the tech world for years.
+      Our goal is to build a trustworthy community where people can find and contribute valuable insights — whether
+      you’re just getting started or you’ve been in the tech world for years.
     </p>
     <p>
-      If you'd like to contribute, have questions, or just want to say hello, feel free to reach out at 
+      If you'd like to contribute, have questions, or just want to say hello, feel free to reach out at
       <a href="mailto:mohammed.ali17955@gmail.com">mohammed.ali17955@gmail.com</a>.
     </p>
   </div>
@@ -143,7 +148,7 @@
         <h3>Crimson Code</h3>
         <p>Your go-to blog for all things development. Clean code, clear concepts.</p>
       </div>
-  
+
       <div class="footer-links">
         <h4>Quick Links</h4>
         <ul>
@@ -152,7 +157,7 @@
           <li><a href="privacy.html">Privacy Policy</a></li>
         </ul>
       </div>
-  
+
       <div class="footer-social">
         <h4>Follow Us</h4>
         <div class="social-icons">
@@ -161,12 +166,18 @@
         </div>
       </div>
     </div>
-  
+
     <div class="footer-bottom">
       <p></p>
     </div>
   </footer>
 </body>
+<script src="../static/scripts/main.js"></script>
 <script src="../static/scripts/common.js"></script>
+<script>
+  $(document).ready(async function () {
+    await window.initCommen();
+  });
+</script>
 
 </html>

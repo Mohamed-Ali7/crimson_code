@@ -1,4 +1,7 @@
 $(document).ready(async function () {
+
+  await window.initCommen();
+
   const host = '192.168.1.2:8080';
   const urlParams = new URLSearchParams(window.location.search);
 
@@ -16,19 +19,25 @@ $(document).ready(async function () {
 
   if (accessToken) {
     const decodedJwtToken = decodeJwt(accessToken);
-    currentUserPublicId = decodedJwtToken.userPublicId;
-    isAdmin = decodedJwtToken.roles.includes(`ROLE_ADMIN`);
+    if (decodedJwtToken) {
+      currentUserPublicId = decodedJwtToken.userPublicId;
+      isAdmin = decodedJwtToken.roles.includes(`ROLE_ADMIN`);
+    }
   } else {
     $(`.comment-form`).hide();
     $(`.login-message`).show();
   }
 
   function decodeJwt(token) {
-    var base64Url = token.split('.')[1];
-    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
+    try {
+      var base64Url = token.split('.')[1];
+      var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+    } catch (error) {
+      return null;
+    }
 
     return JSON.parse(jsonPayload);
   }

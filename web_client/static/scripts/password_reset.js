@@ -1,5 +1,17 @@
-$(document).ready(function () {
+$(document).ready(async function () {
+  await window.initCommen();
 
+  const host = `http://192.168.1.2:8080`;
+  if (Cookies.get(`access_token`)) {
+    $.ajax({
+      method: "GET",
+      url: `${host}/api/users/me`,
+      headers: { 'Authorization': 'Bearer ' + Cookies.get(`access_token`) },
+      success: () => {
+        window.location = `home.html`;
+      }
+    });
+  }
   const urlParams = new URLSearchParams(window.location.search);
 
   const token = urlParams.get(`token`);
@@ -59,7 +71,7 @@ $(document).ready(function () {
     isNewPasswordValid($(this));
     clearErrors($(`.confirm-password-input`));
   });
-  
+
   $(`.confirm-password-input`).on(`blur`, function () {
     isConfirmPasswordValid($(this));
   });
@@ -83,7 +95,7 @@ $(document).ready(function () {
     if (!isNewPasswordValid(newPasswordInput) || !isConfirmPasswordValid(confirmPasswordInput)) {
       return;
     }
-    
+
     const passwordResetData = {
       newPassword: newPasswordInput.val().trim(),
       confirmPassword: confirmPasswordInput.val().trim(),
@@ -96,11 +108,11 @@ $(document).ready(function () {
       data: JSON.stringify(passwordResetData),
       contentType: 'application/json',
       success: (data) => {
-        sessionStorage.setItem('flush_message','Password Reset Successful')
+        sessionStorage.setItem('flush_message', 'Password Reset Successful')
         window.location = `login.html`;
       },
       error: (response) => {
-        if(response.status === 400) {
+        if (response.status === 400) {
           $(`.form-input`).removeClass(`valid`);
           $(`.new-password-input`).addClass(`error`);
           showError($(`.confirm-password-input`), response.responseJSON.message);

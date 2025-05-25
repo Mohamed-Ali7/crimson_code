@@ -1,6 +1,17 @@
-$(document).ready(function () {
+$(document).ready(async function () {
 
-
+  await window.initCommen();
+  const host = `http://192.168.1.2:8080`;
+  if (Cookies.get(`access_token`)) {
+    $.ajax({
+      method: "GET",
+      url: `${host}/api/users/me`,
+      headers: { 'Authorization': 'Bearer ' + Cookies.get(`access_token`) },
+      success: () => {
+        window.location = `home.html`;
+      }
+    });
+  }
   function showError(inputField, message) {
     inputField.addClass('error');
     $('.error-message').css(`visibility`, `visible`).text(message);
@@ -35,7 +46,7 @@ $(document).ready(function () {
     if (!isEmailValid(emailInput)) {
       return;
     }
-  
+
     emailInput.removeClass(`valid`);
 
     const userData = {
@@ -55,7 +66,7 @@ $(document).ready(function () {
         window.location = `login.html`
       },
       error: (response) => {
-        
+
         if (response.status === 404) {
           showError($(`.email-input`), `This email address doesn't exist.`);
         } else if (response.status === 400) {

@@ -1,4 +1,6 @@
-$(document).ready(function () {
+$(document).ready(async function () {
+
+  await window.initCommen();
 
   const host = `192.168.1.2:8080`;
   const accessToken = Cookies.get(`access_token`);

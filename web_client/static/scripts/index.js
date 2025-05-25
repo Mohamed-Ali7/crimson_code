@@ -1,7 +1,8 @@
-$(document).ready(function () {
+$(document).ready(async function () {
 
   const host = `192.168.1.2:8080`;
 
+  await window.initCommen();
 
   const postIds = [36, 48];
 
