@@ -29,7 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private JwtUtils jwtUtils;
 	private HandlerExceptionResolver exceptionResolver;
 	private UserDetailsService userDetailsService;
-	private Map<String, List<HttpMethod>> skipFilterUrls;
+	//private Map<String, List<HttpMethod>> skipFilterUrls;
 	
 	public JwtAuthenticationFilter(JwtUtils jwtUtils, HandlerExceptionResolver exceptionResolver,
 			UserDetailsService userDetailsService) {
@@ -37,17 +37,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		this.exceptionResolver = exceptionResolver;
 		this.userDetailsService = userDetailsService;
 		
-		skipFilterUrls = new HashMap<>();
+		//skipFilterUrls = new HashMap<>();
 		
-		skipFilterUrls.put("/api/auth/**", List.of(HttpMethod.GET, HttpMethod.POST));
-		skipFilterUrls.put("/api/users/*/**", List.of(HttpMethod.GET));
-		skipFilterUrls.put("/api/users/password-reset/**", List.of(HttpMethod.GET, HttpMethod.POST));
-		skipFilterUrls.put("/images/**", List.of(HttpMethod.GET));
-		skipFilterUrls.put("/api/categories/**", List.of(HttpMethod.GET));
-		skipFilterUrls.put("/api/posts/**", List.of(HttpMethod.GET));
-		skipFilterUrls.put("/api/tags/**", List.of(HttpMethod.GET));
+		//skipFilterUrls.put("/api/auth/**", List.of(HttpMethod.GET, HttpMethod.POST));
+		//skipFilterUrls.put("/api/users/*/**", List.of(HttpMethod.GET));
+		//skipFilterUrls.put("/api/users/password-reset/**", List.of(HttpMethod.GET, HttpMethod.POST));
+		//skipFilterUrls.put("/images/**", List.of(HttpMethod.GET));
+		//skipFilterUrls.put("/api/categories/**", List.of(HttpMethod.GET));
+		//skipFilterUrls.put("/api/posts/**", List.of(HttpMethod.GET));
+		//skipFilterUrls.put("/api/tags/**", List.of(HttpMethod.GET));
 	}
-
+	/*
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
 		String url = "";
@@ -72,11 +72,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		
 		return false;
 	}
+	*/
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 
+		if (request.getServletPath().equals("/api/auth/refresh") || 
+				request.getServletPath().equals("/api/auth/login") || 
+				request.getServletPath().equals("/api/auth/register")) {
+			
+			filterChain.doFilter(request, response);
+			return;
+		}
+		
 		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 		
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {

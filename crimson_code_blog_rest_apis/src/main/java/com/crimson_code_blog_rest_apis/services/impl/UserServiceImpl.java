@@ -159,6 +159,8 @@ public class UserServiceImpl implements UserService {
 			}
 		});
 		
+		passwordResetTokenRepository.deleteByUserId(userEntity.getId());
+		
 		userRepository.delete(userEntity);
 		
 	}
