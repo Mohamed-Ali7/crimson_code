@@ -69,9 +69,6 @@ public class UserEntity {
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<CommentEntity> comments;
 	
-	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private PasswordResetTokenEntity passwordResetToken;
-	
 	public UserEntity() {
 
 	}
