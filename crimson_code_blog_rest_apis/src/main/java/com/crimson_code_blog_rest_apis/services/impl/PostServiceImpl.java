@@ -37,6 +37,7 @@ import com.crimson_code_blog_rest_apis.entity.UserEntity;
 import com.crimson_code_blog_rest_apis.exceptions.CrimsonCodeGlobalException;
 import com.crimson_code_blog_rest_apis.exceptions.ResourceNotFoundException;
 import com.crimson_code_blog_rest_apis.repository.CategoryRepository;
+import com.crimson_code_blog_rest_apis.repository.CommentRepository;
 import com.crimson_code_blog_rest_apis.repository.PostRepository;
 import com.crimson_code_blog_rest_apis.repository.TagRepository;
 import com.crimson_code_blog_rest_apis.repository.UserRepository;
@@ -44,6 +45,8 @@ import com.crimson_code_blog_rest_apis.security.UserPrincipal;
 import com.crimson_code_blog_rest_apis.services.PostService;
 import com.crimson_code_blog_rest_apis.utils.GlobalUtils;
 import com.crimson_code_blog_rest_apis.utils.UserRoles;
+
+import jakarta.transaction.Transactional;
 
 
 @Service
@@ -54,15 +57,18 @@ public class PostServiceImpl implements PostService {
 	private CategoryRepository categoryRepository;
 	private TagRepository tagRepository;
 	private static ModelMapper modelMapper;
+	private CommentRepository commentRepository;
 
 	@Autowired
 	public PostServiceImpl(PostRepository postRepository, UserRepository userRepository,
-			CategoryRepository categoryRepository, TagRepository tagRepository, ModelMapper modelMapper) {
+			CategoryRepository categoryRepository, TagRepository tagRepository, ModelMapper modelMapper,
+			CommentRepository commentRepository) {
 		this.postRepository = postRepository;
 		this.userRepository = userRepository;
 		this.categoryRepository = categoryRepository;
 		this.tagRepository = tagRepository;
 		PostServiceImpl.modelMapper = modelMapper;
+		this.commentRepository = commentRepository;
 	}
 
 	@Override
@@ -251,6 +257,7 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
+	@Transactional
 	public void deletePost(long postId, UserPrincipal userPrincipal) {
 		PostEntity postEntity = postRepository.findById(postId)
 				.orElseThrow(() -> new ResourceNotFoundException("Post does not exist with id: " + postId));
@@ -264,6 +271,7 @@ public class PostServiceImpl implements PostService {
 					"UNAUTHORIZED: User " + userPrincipal.getUsername() + " is not authorized to delete this post");
 		}
 
+		commentRepository.deleteByPostId(postId);
 		postRepository.delete(postEntity);
 	}
 
