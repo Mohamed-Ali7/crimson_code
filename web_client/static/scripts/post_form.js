@@ -2,7 +2,8 @@ $(document).ready(async function () {
 
   await window.initCommen();
 
-  const host = `192.168.1.2:8080`;
+  const host = window.host;
+
   const accessToken = Cookies.get(`access_token`);
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -16,11 +17,11 @@ $(document).ready(async function () {
     return;
   }
 
-  let apiRequestUrl = `http://${host}/api/posts`;
+  let apiRequestUrl = `${host}/api/posts`;
   let apiRequestMethod = `POST`;
 
   if (isEditMode) {
-    apiRequestUrl = `http://${host}/api/posts/${postId}`;
+    apiRequestUrl = `${host}/api/posts/${postId}`;
     apiRequestMethod = `PUT`;
   }
 
@@ -78,7 +79,7 @@ $(document).ready(async function () {
   if (isEditMode) {
     $.ajax({
       method: `GET`,
-      url: `http://${host}/api/posts/${postId}`,
+      url: `${host}/api/posts/${postId}`,
       success: function (post) {
 
         const cancelPostEditButton = $(`<button type="submit" class="cancel-post-edit-button">Cancel</button>`);
@@ -97,7 +98,7 @@ $(document).ready(async function () {
 
         if (post.imageUrl) {
 
-          imagePreview.html(`<img src="http://${host}${post.imageUrl}" alt="Image Preview" />`);
+          imagePreview.html(`<img src="${host}${post.imageUrl}" alt="Image Preview" />`);
           imagePreview.css(`padding`, 0);
           imagePreview.css(`border`, `none`)
 
@@ -365,7 +366,7 @@ $(document).ready(async function () {
 
     const postData = {
       title: postTitleInput.val().trim(),
-      content: postContentInput.val().trim().replace(/<br>/g, '\n'),
+      content: postContentInput.val().trim(),
       categoryId: postCateogryInput.data(`category-id`),
       tags: tags,
     }
@@ -408,6 +409,11 @@ $(document).ready(async function () {
   function showError(inputField, message) {
     inputField.addClass('error');
     inputField.closest(`.form-group`).next('.error-message').css(`visibility`, `visible`).text(message);
+
+    const element = document.querySelector(`#${inputField.attr('id')}`);
+    const y = element.getBoundingClientRect().top + window.pageYOffset - 50;
+
+    window.scrollTo({ top: y, behavior: 'smooth' });
   }
 
   function clearErrors(inputField) {

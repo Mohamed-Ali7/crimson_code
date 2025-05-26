@@ -1,8 +1,9 @@
 $(document).ready(async function () {
   await window.initCommen();
 
-  const host = `192.168.1.2:8080`;
-  let requestURL = `http://${host}/api/posts?`;
+  const host = window.host;
+
+  let requestURL = `${host}/api/posts?`;
 
   const urlParams = new URLSearchParams(window.location.search);
 
@@ -15,11 +16,11 @@ $(document).ready(async function () {
   if (searchParam || searchTagsParam) {
     const encodedSearchParam = encodeURIComponent(searchParam);
     const encodedSearchTagsParam =  encodeURIComponent(searchTagsParam)
-    requestURL = `http://${host}/api/posts/search?query=${(encodedSearchParam)}&tags=${encodedSearchTagsParam}&`;
+    requestURL = `${host}/api/posts/search?query=${(encodedSearchParam)}&tags=${encodedSearchTagsParam}&`;
   } else if (tagParam) {
-    requestURL = `http://${host}/api/tags/${encodeURIComponent(tagParam)}/posts?`;
+    requestURL = `${host}/api/tags/${encodeURIComponent(tagParam)}/posts?`;
   } else if (categoryParam) {
-    requestURL = `http://${host}/api/categories/${encodeURIComponent(categoryParam)}/posts?`;
+    requestURL = `${host}/api/categories/${encodeURIComponent(categoryParam)}/posts?`;
   }
 
   const page = urlParams.get(`page`) ? urlParams.get(`page`) : 1;
@@ -38,7 +39,7 @@ $(document).ready(async function () {
         const postImage = $(`<img class="post-image" alt="Post Thumbnail">`);
 
         if (post.imageUrl) {
-          postImage.attr(`src`, `http://${host}${post.imageUrl}`);
+          postImage.attr(`src`, `${host}${post.imageUrl}`);
         } else {
           postImage.attr(`src`, '../static/images/default_post_thumbnail.png');
         }
@@ -68,7 +69,7 @@ $(document).ready(async function () {
         authorInfoContainer.data(`user-id`, user.publicId);
 
         if (user.profileImgUrl) {
-          authorAvatar.attr(`src`, `http://${host}${user.profileImgUrl}`);
+          authorAvatar.attr(`src`, `${host}${user.profileImgUrl}`);
         } else {
           authorAvatar.attr(`src`, '../static/images/default_profile_pic.png');
         }

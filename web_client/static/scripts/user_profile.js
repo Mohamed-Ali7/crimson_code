@@ -1,7 +1,8 @@
 $(document).ready(async function () {
   await window.initCommen();
 
-  const host = `192.168.1.2:8080`;
+  const host = window.host;
+
   const urlParams = new URLSearchParams(window.location.search);
 
   const userProfileId = urlParams.get(`id`);
@@ -40,14 +41,14 @@ $(document).ready(async function () {
 
   $.ajax({
     method: `GET`,
-    url: `http://${host}/api/users/${decodeURIComponent(userProfileId)}`,
+    url: `${host}/api/users/${decodeURIComponent(userProfileId)}`,
     success: function (user) {
 
       const profileAvatar = $(`.avatar`);
       const profileAvatarImage = $(`.avatar-image`);
 
       if (user.profileImgUrl) {
-        profileAvatarImage.attr(`src`, `http://${host}${user.profileImgUrl}`);
+        profileAvatarImage.attr(`src`, `${host}${user.profileImgUrl}`);
       } else {
         profileAvatarImage.attr(`src`, '../static/images/default_profile_pic.png');
       }
@@ -109,7 +110,7 @@ $(document).ready(async function () {
   function laodUserPosts(page) {
     $.ajax({
       method: `GET`,
-      url: `http://${host}/api/users/${userProfileId}/posts?page=${page}&size=5&sort_dir=desc`,
+      url: `${host}/api/users/${userProfileId}/posts?page=${page}&size=5&sort_dir=desc`,
       success: function (postPage) {
         const postTabContent = $(`.post-tab-content`).empty();
 
@@ -281,7 +282,7 @@ $(document).ready(async function () {
 
       const nameUpdate = $.ajax({
         method: `PUT`,
-        url: `http://${host}/api/users/${userProfileId}`,
+        url: `${host}/api/users/${userProfileId}`,
         data: JSON.stringify({ firstName: firstName, lastName: lastName }),
         contentType: `application/json`,
         headers: { 'Authorization': 'Bearer ' + accessToken },
@@ -314,7 +315,7 @@ $(document).ready(async function () {
 
       const profilePictureUpdate = $.ajax({
         method: `PUT`,
-        url: `http://${host}/api/users/me/profile-picture`,
+        url: `${host}/api/users/me/profile-picture`,
         data: formData,
         headers: { Authorization: 'Bearer ' + accessToken },
         processData: false,
@@ -380,7 +381,7 @@ $(document).ready(async function () {
 
       const passwordUpdate = $.ajax({
         method: `PUT`,
-        url: `http://${host}/api/users/me/change-password`,
+        url: `${host}/api/users/me/change-password`,
         data: JSON.stringify(passwordData),
         contentType: `application/json`,
         headers: { Authorization: 'Bearer ' + accessToken },
@@ -438,7 +439,7 @@ $(document).ready(async function () {
       if (result.isConfirmed) {
         $.ajax({
           method: 'DELETE',
-          url: `http://${host}/api/users/${userProfileId}`,
+          url: `${host}/api/users/${userProfileId}`,
           headers: { Authorization: 'Bearer ' + accessToken },
           success: function () {
             Swal.fire({

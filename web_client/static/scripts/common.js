@@ -1,7 +1,9 @@
 $(document).ready(async function () {
 
   window.initCommen = async () => {
-    const host = `192.168.1.2:8080`;
+    const host = `http://localhost:8080`;
+
+    window.host = host;
 
     const customErrorMessage = `An error occurred while sending the request, please try again later or contact support`;
     let isUserLoggedIn = true;
@@ -29,7 +31,7 @@ $(document).ready(async function () {
 
       return await $.ajax({
         method: "GET",
-        url: `http://${host}/api/users/me`,
+        url: `${host}/api/users/me`,
         headers: { 'Authorization': 'Bearer ' + accessToken }
       }).then((user) => {
         const localStorageUser = {
@@ -61,7 +63,7 @@ $(document).ready(async function () {
 
       return await $.ajax({
         method: `GET`,
-        url: `http://${host}/api/tags?size=100000`,
+        url: `${host}/api/tags?size=100000`,
         contentType: `application/json`
       }).then(function (data) {
         sessionStorage.setItem(`tags`, JSON.stringify(data.content));
@@ -86,7 +88,7 @@ $(document).ready(async function () {
         const downArrow = $(`<i class="fa fa-caret-down"></i>`);
 
         if (user.profileImgUrl) {
-          profilePictureURL.attr(`src`, `http://${host}${user.profileImgUrl}`);
+          profilePictureURL.attr(`src`, `${host}${user.profileImgUrl}`);
         } else {
           profilePictureURL.attr(`src`, '../static/images/navbar_default_profile_pic.png');
         }
@@ -130,7 +132,7 @@ $(document).ready(async function () {
 
       return await $.ajax({
         method: `GET`,
-        url: `http://${host}/api/categories?size=10000`,
+        url: `${host}/api/categories?size=10000`,
         contentType: `application/json`
       }).then(function (data) {
         sessionStorage.setItem(`categories`, JSON.stringify(data.content));
@@ -353,7 +355,7 @@ $(document).ready(async function () {
 
       $.ajax({
         method: `POST`,
-        url: `http://${host}/api/auth/logout`,
+        url: `${host}/api/auth/logout`,
         data: JSON.stringify(reqData),
         contentType: `application/json`,
         headers: { 'Authorization': `Bearer ${accessToken}` },

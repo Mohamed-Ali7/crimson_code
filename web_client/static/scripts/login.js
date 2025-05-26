@@ -1,6 +1,7 @@
 $(document).ready(async function () {
   await window.initCommen();
-  const host = `http://192.168.1.2:8080`;
+
+  const host = window.host;
 
   if (Cookies.get(`access_token`)) {
     $.ajax({
@@ -127,7 +128,11 @@ $(document).ready(async function () {
             .show();
           return;
         }
-        console.error(response.responseJSON.message);
+        if (response.responseJSON) {
+          console.error(response.responseJSON.message);
+        } else {
+          console.error(`An error occurred while sending the request, please try again later`)
+        }
         showError();
       }
     });

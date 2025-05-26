@@ -1,7 +1,8 @@
 $(document).ready(async function () {
   await window.initCommen();
 
-  const host = `http://192.168.1.2:8080`;
+  const host = window.host;
+
   if (Cookies.get(`access_token`)) {
     $.ajax({
       method: "GET",
@@ -47,7 +48,7 @@ $(document).ready(async function () {
 
     $.ajax({
       method: "POST",
-      url: "http://localhost:8080/api/users/password-reset/request",
+      url: `${host}/api/users/password-reset/request`,
       data: JSON.stringify(userData),
       contentType: 'application/json',
       success: (data) => {

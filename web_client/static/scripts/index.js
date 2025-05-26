@@ -1,8 +1,8 @@
 $(document).ready(async function () {
 
-  const host = `192.168.1.2:8080`;
-
   await window.initCommen();
+
+  const host = window.host;
 
   const postIds = [36, 48];
 
@@ -10,7 +10,7 @@ $(document).ready(async function () {
 
     $.ajax({
       method: `GET`,
-      url: `http://${host}/api/posts/${postId}`,
+      url: `${host}/api/posts/${postId}`,
       success: function (post) {
 
         const postCard = $(`<div class="post-card"></div>`).data(`post-id`, post.id);
@@ -18,7 +18,7 @@ $(document).ready(async function () {
         const postImage = $(`<img class="post-image" alt="Post Thumbnail">`);
 
         if (post.imageUrl) {
-          postImage.attr(`src`, `http://${host}${post.imageUrl}`);
+          postImage.attr(`src`, `${host}${post.imageUrl}`);
         } else {
           postImage.attr(`src`, '../static/images/default_post_thumbnail.png');
         }

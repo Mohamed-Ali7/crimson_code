@@ -2,7 +2,8 @@ $(document).ready(async function () {
 
   await window.initCommen();
 
-  const host = '192.168.1.2:8080';
+  const host = window.host;
+
   const urlParams = new URLSearchParams(window.location.search);
 
   const postId = urlParams.get(`id`);
@@ -78,11 +79,10 @@ $(document).ready(async function () {
 
   $.ajax({
     method: `GET`,
-    url: `http://${host}/api/posts/${postId}`,
+    url: `${host}/api/posts/${postId}`,
     success: function (post) {
-      const postContent = post.content.replace(/\n/g, '<br>');
       $('.post-title').text(post.title);
-      $('.post-content').html(postContent);
+      $('.post-content').text(post.content);
       const user = post.user;
 
       $('.post-author-name').text(`${user.firstName} ${user.lastName}`).data(`user-id`, user.publicId);
@@ -92,7 +92,7 @@ $(document).ready(async function () {
       const userAvatar = $('.post-author-avatar');
 
       if (user.profileImgUrl) {
-        userAvatar.attr(`src`, `http://${host}${user.profileImgUrl}`);
+        userAvatar.attr(`src`, `${host}${user.profileImgUrl}`);
       } else {
         userAvatar.attr(`src`, '../static/images/default_profile_pic.png');
       }
@@ -113,7 +113,7 @@ $(document).ready(async function () {
       postCategory.data(`category-name`, post.category.name.toLowerCase());
 
       if (post.imageUrl) {
-        $('.post-image').attr('src', `http://${host}${post.imageUrl}`);
+        $('.post-image').attr('src', `${host}${post.imageUrl}`);
       } else {
         $('.post-image').attr('src', '../static/images/default_post_thumbnail.png');
       }
@@ -160,7 +160,7 @@ $(document).ready(async function () {
       if (result.isConfirmed) {
         $.ajax({
           method: `DELETE`,
-          url: `http://${host}/api/posts/${postId}`,
+          url: `${host}/api/posts/${postId}`,
           headers: { Authorization: 'Bearer ' + accessToken },
           success: function () {
             window.location = `home.html`;
@@ -181,7 +181,7 @@ $(document).ready(async function () {
     const commentsSize = 6;
     $.ajax({
       method: `GET`,
-      url: `http://${host}/api/posts/${postId}/comments?page=${page}&size=${commentsSize}`,
+      url: `${host}/api/posts/${postId}/comments?page=${page}&size=${commentsSize}`,
       success: function (commentsPage) {
         $(`.comments-list`).empty();
 
@@ -239,7 +239,7 @@ $(document).ready(async function () {
     commentAuthorAvatar.data(`user-id`, commentAuthor.publicId)
 
     if (commentAuthor.profileImgUrl) {
-      commentAuthorAvatar.attr(`src`, `http://${host}${commentAuthor.profileImgUrl}`);
+      commentAuthorAvatar.attr(`src`, `${host}${commentAuthor.profileImgUrl}`);
     } else {
       commentAuthorAvatar.attr(`src`, '../static/images/default_profile_pic.png');
     }
@@ -258,8 +258,7 @@ $(document).ready(async function () {
 
     commentAuthorBox.append(commentAuthorAvatar, commentAuthorName, commentDate);
 
-    const formattedCommentContent = comment.content.replace(/\n/g, '<br>');
-    const commentContent = $('<div class="comment-content"></div>').html(formattedCommentContent);
+    const commentContent = $('<div class="comment-content"></div>').text(comment.content);
 
     commentMeta.append(commentAuthorBox);
 
@@ -284,7 +283,7 @@ $(document).ready(async function () {
 
     $.ajax({
       method: `POST`,
-      url: `http://${host}/api/posts/${postId}/comments`,
+      url: `${host}/api/posts/${postId}/comments`,
       data: JSON.stringify({ content: commentInputValue }),
       contentType: `application/json`,
       headers: { 'Authorization': 'Bearer ' + accessToken },
@@ -315,7 +314,6 @@ $(document).ready(async function () {
 
     const currentComment = $(this).closest(`.comment-wrapper`);
     const currentCommentContent = currentComment.find(`.comment-content`);
-    const currentCommentContentText = currentCommentContent.html().replace(/<br>/g, '\n');
     currentCommentContent.hide();
     currentComment.find(`.comment-buttons`).addClass(`hide`);
 
@@ -328,7 +326,7 @@ $(document).ready(async function () {
 
     updateCommentTextarea.height(currentCommentContent.outerHeight(true) + 20);
 
-    updateCommentTextarea.val(currentCommentContentText);
+    updateCommentTextarea.val(currentCommentContent.text());
 
     updateCommentButtons.append(saveCommentButton, cancelEditButton);
     updateCommentForm.append(updateCommentTextarea, updateCommentButtons);
@@ -399,7 +397,7 @@ $(document).ready(async function () {
       if (result.isConfirmed) {
         $.ajax({
           method: `PUT`,
-          url: `http://${host}/api/posts/${postId}/comments/${currentCommentId}`,
+          url: `${host}/api/posts/${postId}/comments/${currentCommentId}`,
           data: JSON.stringify({ content: newContent }),
           contentType: `application/json`,
           headers: { Authorization: 'Bearer ' + accessToken },
@@ -410,7 +408,7 @@ $(document).ready(async function () {
             currentComment.find(`.comment-buttons`).removeClass(`hide`);
             $(`.comment-buttons button`).prop('disabled', false)
 
-            currentComment.find(`.comment-content`).html(newComment.content.replace(/\n/g, `<br>`)).show();
+            currentComment.find(`.comment-content`).text(newComment.content).show();
 
           },
           error: function (response) {
@@ -446,7 +444,7 @@ $(document).ready(async function () {
       if (result.isConfirmed) {
         $.ajax({
           method: `DELETE`,
-          url: `http://${host}/api/posts/${postId}/comments/${currentCommentId}`,
+          url: `${host}/api/posts/${postId}/comments/${currentCommentId}`,
           headers: { Authorization: 'Bearer ' + accessToken },
           success: function (data) {
             currentComment.remove();

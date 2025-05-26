@@ -1,7 +1,8 @@
 $(document).ready(async function () {
   await window.initCommen();
 
-  const host = `http://192.168.1.2:8080`;
+  const host = window.host;
+
   if (Cookies.get(`access_token`)) {
     $.ajax({
       method: "GET",
@@ -18,7 +19,7 @@ $(document).ready(async function () {
 
   $.ajax({
     method: `GET`,
-    url: `http://localhost:8080/api/users/password-reset/validate?token=${token}`,
+    url: `${host}/api/users/password-reset/validate?token=${token}`,
     success: function () {
       $(`.password-reset-card`).show();
       return;
@@ -104,7 +105,7 @@ $(document).ready(async function () {
 
     $.ajax({
       method: "POST",
-      url: "http://localhost:8080/api/users/password-reset/confirm",
+      url: `${host}/api/users/password-reset/confirm`,
       data: JSON.stringify(passwordResetData),
       contentType: 'application/json',
       success: (data) => {

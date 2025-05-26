@@ -1,7 +1,9 @@
 $(document).ready(async function () {
 
   await window.initCommen();
-  const host = `http://192.168.1.2:8080`;
+
+  const host = window.host;
+
   if (Cookies.get(`access_token`)) {
     $.ajax({
       method: "GET",
@@ -23,7 +25,7 @@ $(document).ready(async function () {
 
   $.ajax({
     method: `GET`,
-    url: `http://localhost:8080/api/auth/email-verification?token=${token}`,
+    url: `${host}/api/auth/email-verification?token=${token}`,
     success: function (data) {
       sessionStorage.setItem(`flush_message`, `Your email has been verified successfully`);
       window.location = `login.html`;
