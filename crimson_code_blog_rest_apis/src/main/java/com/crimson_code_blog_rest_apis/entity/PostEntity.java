@@ -72,7 +72,10 @@ public class PostEntity {
 	)
 	private List<TagEntity> tags;
 	
-	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = {
+			CascadeType.PERSIST, CascadeType.DETACH,
+			CascadeType.MERGE, CascadeType.REFRESH
+	})
 	private List<CommentEntity> comments;
 
 	public PostEntity() {

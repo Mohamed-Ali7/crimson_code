@@ -30,6 +30,7 @@ import com.crimson_code_blog_rest_apis.entity.UserEntity;
 import com.crimson_code_blog_rest_apis.exceptions.CrimsonCodeGlobalException;
 import com.crimson_code_blog_rest_apis.exceptions.JwtTokenException;
 import com.crimson_code_blog_rest_apis.exceptions.ResourceNotFoundException;
+import com.crimson_code_blog_rest_apis.repository.CommentRepository;
 import com.crimson_code_blog_rest_apis.repository.PasswordResetTokenRepository;
 import com.crimson_code_blog_rest_apis.repository.PostRepository;
 import com.crimson_code_blog_rest_apis.repository.UserRepository;
@@ -40,8 +41,17 @@ import com.crimson_code_blog_rest_apis.utils.GlobalUtils;
 import com.crimson_code_blog_rest_apis.utils.JwtTokenType;
 import com.crimson_code_blog_rest_apis.utils.JwtUtils;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
+
 @Service
 public class UserServiceImpl implements UserService {
+
+	/*
+	 * @PersistenceContext
+	 * private EntityManager entityManager;
+	 */
 
 	private UserRepository userRepository;
 	private ModelMapper modelMapper;
@@ -50,11 +60,12 @@ public class UserServiceImpl implements UserService {
 	private PasswordResetTokenRepository passwordResetTokenRepository;
 	private PasswordEncoder passwordEncoder;
 	private PostRepository postRepository;
+	private CommentRepository commentRepository;
 	
 	@Autowired
 	public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper, JwtUtils jwtUtils,
 			EmailService emailService, PasswordResetTokenRepository passwordResetTokenRepository,
-			PasswordEncoder passwordEncoder, PostRepository postRepository) {
+			PasswordEncoder passwordEncoder, PostRepository postRepository, CommentRepository commentRepository) {
 
 		this.userRepository = userRepository;
 		this.modelMapper = modelMapper;
@@ -63,6 +74,7 @@ public class UserServiceImpl implements UserService {
 		this.passwordResetTokenRepository = passwordResetTokenRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.postRepository = postRepository;
+		this.commentRepository = commentRepository;
 	}
 
 	@Override
@@ -148,6 +160,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteUser(String publicId) {
 
 		UserEntity userEntity = userRepository.findByPublicId(publicId)
@@ -159,7 +172,38 @@ public class UserServiceImpl implements UserService {
 			}
 		});
 		
-		passwordResetTokenRepository.deleteByUserId(userEntity.getId());
+		long userId = userEntity.getId();
+		
+		passwordResetTokenRepository.deleteByUserId(userId);
+		
+		commentRepository.deleteByUserId(userId);
+		
+		/*
+		 * At this point, the user's posts have been loaded and are cached in the persistence context (entityManager).
+		 * Because bulk delete queries (used later) bypass the persistence context and directly affect the database,
+		 * the cached post entities are not synchronized and remain attached, causing Hibernate to still think 
+		 * the user is related to these posts.
+		 *
+		 * As a result, if we try to delete the user entity now without clearing or detaching these cached posts,
+		 * Hibernate will silently skip the user deletion because it believes the user still has existing post references.
+		 *
+		 * Therefore, we must either detach these cached posts or clear the persistence context
+		 * after bulk deletion to keep Hibernate's cache consistent before deleting the user entity.
+		 */
+		/*List<PostEntity> userPosts = 
+				postRepository.findAllByUserId(userId, Pageable.unpaged()).getContent();*/
+		
+		// Cleaner and simpler solution as there is no need to cache post entities in the entityManager
+		List<Long> postIds = postRepository.findPostIdsByUserId(userId);
+
+		commentRepository.deleteByPostIds(postIds);
+		
+		postRepository.deleteByUserId(userId);
+		
+		//entityManager.flush();
+		
+		// clearing the persistence context to remove the cached posts
+		//entityManager.clear();
 		
 		userRepository.delete(userEntity);
 		
