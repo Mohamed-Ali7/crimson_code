@@ -1,13 +1,12 @@
 $(document).ready(async function () {
 
-  await window.initCommen();
-
   const host = window.host;
 
   const urlParams = new URLSearchParams(window.location.search);
 
   const postId = urlParams.get(`id`);
-  const accessToken = Cookies.get(`access_token`);
+
+  let accessToken = Cookies.get(`access_token`);
 
   let currentUserPublicId;
   let isAdmin = false;
@@ -16,6 +15,13 @@ $(document).ready(async function () {
 
   if (!postId || containsAlphabet) {
     window.location = `not_found.html`;
+  }
+
+  let isUserLoggedIn = true;
+
+  if (!accessToken) {
+    isUserLoggedIn = await checkAuth();
+    accessToken = Cookies.get(`access_token`);
   }
 
   if (accessToken) {
@@ -118,6 +124,13 @@ $(document).ready(async function () {
         $('.post-image').attr('src', '../static/images/default_post_thumbnail.png');
       }
 
+      $('.post-image').on(`error`, function () {
+        const defaultSrc = '../static/images/default_post_thumbnail.png';
+        if ($(this).attr('src') !== defaultSrc) {
+          $(this).attr('src', defaultSrc);
+        }
+      });
+
       post.tags.forEach(tag => {
         const tagElement = $(`<span class="post-tag">${tag.name.toLowerCase()}</span>`);
         tagElement.data(`tag-name`, tag.name.toLowerCase());
@@ -140,6 +153,9 @@ $(document).ready(async function () {
           console.error(`An error occurred while sending the request, please try again later`)
         }
       }
+    },
+    complete: function () {
+      $(`#loading-spinner`).hide();
     }
   });
 
@@ -158,6 +174,7 @@ $(document).ready(async function () {
       scrollbarPadding: false
     }).then((result) => {
       if (result.isConfirmed) {
+        $(`#loading-spinner`).show();
         $.ajax({
           method: `DELETE`,
           url: `${host}/api/posts/${postId}`,
@@ -171,6 +188,9 @@ $(document).ready(async function () {
             } else {
               console.error(`An error occurred while sending the request, please try again later`)
             }
+          },
+          complete: function () {
+            $(`#loading-spinner`).hide();
           }
         });
       }
@@ -314,6 +334,7 @@ $(document).ready(async function () {
 
     const currentComment = $(this).closest(`.comment-wrapper`);
     const currentCommentContent = currentComment.find(`.comment-content`);
+    const currentCommentContentText = currentCommentContent.text();
     currentCommentContent.hide();
     currentComment.find(`.comment-buttons`).addClass(`hide`);
 
@@ -326,7 +347,7 @@ $(document).ready(async function () {
 
     updateCommentTextarea.height(currentCommentContent.outerHeight(true) + 20);
 
-    updateCommentTextarea.val(currentCommentContent.text());
+    updateCommentTextarea.val(currentCommentContentText);
 
     updateCommentButtons.append(saveCommentButton, cancelEditButton);
     updateCommentForm.append(updateCommentTextarea, updateCommentButtons);

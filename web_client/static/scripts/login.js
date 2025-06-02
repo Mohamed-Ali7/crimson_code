@@ -1,13 +1,19 @@
 $(document).ready(async function () {
-  await window.initCommen();
 
   const host = window.host;
 
-  if (Cookies.get(`access_token`)) {
+  const accessToken = Cookies.get(`access_token`);
+  let isUserLoggedIn = true;
+
+  if (!accessToken) {
+    isUserLoggedIn = await checkAuth();
+  }
+
+  if (isUserLoggedIn) {
     $.ajax({
       method: "GET",
       url: `${host}/api/users/me`,
-      headers: { 'Authorization': 'Bearer ' + Cookies.get(`access_token`) },
+      headers: { 'Authorization': 'Bearer ' + accessToken },
       success: () => {
         window.location = `home.html`
       }
@@ -85,13 +91,16 @@ $(document).ready(async function () {
       password: password,
     };
 
+    $(`.login-btn`).prop(`disabled`, true);
+
+    $(`#loading-spinner`).css(`display`, `flex`);
+
     $.ajax({
       method: "POST",
       url: `${host}/api/auth/login`,
       data: JSON.stringify(userData),
       contentType: 'application/json',
       success: (data) => {
-
         Cookies.set('access_token', data.accessToken, { expires: 10, path: `/` });
         Cookies.set('refresh_token', data.refreshToken, { expires: 10, path: `/` });
 
@@ -122,18 +131,20 @@ $(document).ready(async function () {
       },
 
       error: (response) => {
+        $(`.login-btn`).prop(`disabled`, false);
         if (response.status === 403) {
           $(`.flush-message`).css(`background-color`, `#9E1B32`)
             .text(`Your email is not verified. Please check your inbox or resend the verification email.`)
             .show();
           return;
-        }
-        if (response.responseJSON) {
+        } else if (response.responseJSON) {
           console.error(response.responseJSON.message);
-        } else {
-          console.error(`An error occurred while sending the request, please try again later`)
         }
+        
         showError();
+      },
+      complete: function () {
+        $(`#loading-spinner`).hide();
       }
     });
   });

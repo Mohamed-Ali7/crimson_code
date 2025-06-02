@@ -394,6 +394,14 @@
   cursor: pointer;
 }
 
+.save-btn:disabled {
+  background-color: #4f71bb;
+}
+
+.save-btn:hover:disabled {
+  background-color: #4f71bb;
+}
+
 .cancel-modal-btn {
   background-color: #ffffff;
   color: #2563eb;

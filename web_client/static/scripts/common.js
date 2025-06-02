@@ -1,9 +1,6 @@
 $(document).ready(async function () {
 
-  window.initCommen = async () => {
-    const host = `http://localhost:8080`;
-
-    window.host = host;
+    const host = window.host;
 
     const customErrorMessage = `An error occurred while sending the request, please try again later or contact support`;
     let isUserLoggedIn = true;
@@ -52,7 +49,7 @@ $(document).ready(async function () {
     }
 
     $(`.logo`).on(`click`, function () {
-      window.location = `index.html`;
+      window.location = `/`;
     });
 
     async function loadTags() {
@@ -78,7 +75,6 @@ $(document).ready(async function () {
       });
     }
 
-
     if (isUserLoggedIn) {
       loadCurrentUser().then(user => {
 
@@ -99,7 +95,6 @@ $(document).ready(async function () {
             $(this).attr('src', defaultSrc);
           }
         });
-
 
         userFullName.text(`${user.firstName} ${user.lastName}`);
 
@@ -162,11 +157,6 @@ $(document).ready(async function () {
         categoryDropdownList.append(categoryDropdownListItem);
       })
     });
-
-    window.loadTags = loadTags;
-    window.loadCategories = loadCategories;
-
-
 
     const mainWrapper = $(`body main`);
     const navButtons = $(`.navbar-buttons`);
@@ -384,13 +374,6 @@ $(document).ready(async function () {
       window.location = `sign_up.html`;
     });
 
-    $(`.nav-left-buttons .home-btn`).on(`click`, function () {
-      window.location = `home.html`;
-    });
-
-
     $(`.site-footer .footer-bottom p`).text(`© ${new Date().getFullYear()} Crimson Code. All rights reserved.`);
-
-  }
 
 }); 

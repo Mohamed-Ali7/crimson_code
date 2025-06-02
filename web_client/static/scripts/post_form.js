@@ -1,17 +1,19 @@
 $(document).ready(async function () {
 
-  await window.initCommen();
-
   const host = window.host;
-
   const accessToken = Cookies.get(`access_token`);
 
   const urlParams = new URLSearchParams(window.location.search);
   const postId = urlParams.get(`id`);
   const isEditMode = urlParams.get(`edit`) && postId;
 
+  let isUserLoggedIn = true;
 
   if (!accessToken) {
+    isUserLoggedIn = await checkAuth();
+  }
+
+  if (!isUserLoggedIn) {
     $(`#post-form`).hide();
     $(`.login-prompt`).show();
     return;
@@ -27,23 +29,42 @@ $(document).ready(async function () {
 
   const existedTags = new Set();
   const selectedTags = new Set();
-  const categories = loadCategories(); // from common.js file
-  const sessionTags = loadTags(); // from common.js file
+
+  async function loadCategories() {
+    let categories = sessionStorage.getItem(`categories`);
+    if (categories) {
+      return Promise.resolve(JSON.parse(categories));
+    }
+
+    return await $.ajax({
+      method: `GET`,
+      url: `${host}/api/categories?size=10000`,
+      contentType: `application/json`
+    }).then(function (data) {
+      sessionStorage.setItem(`categories`, JSON.stringify(data.content));
+      return data.content;
+    }).catch(function (response) {
+      if (response.responseJSON) {
+        console.error(response.responseJSON.message);
+      } else {
+        console.error(customErrorMessage);
+      }
+      return [];
+    });
+  }
 
   const postCategoryDropdown = $(`.post-category-dropdown`);
 
-  if (categories) {
-    categories.then(categoryList => {
-      categoryList.forEach(category => {
-        const categorySpan = $(`<span class="post-category-dropdown-item"></span>`);
-        categorySpan.data(`category-id`, category.id);
-        categorySpan.text(category.name);
+  loadCategories().then(categoryList => {
+    categoryList.forEach(category => {
+      const categorySpan = $(`<span class="post-category-dropdown-item"></span>`);
+      categorySpan.data(`category-id`, category.id);
+      categorySpan.text(category.name);
 
-        postCategoryDropdown.append(categorySpan);
-      })
+      postCategoryDropdown.append(categorySpan);
+    })
 
-    });
-  }
+  });
 
   $(`.post-category-container`).on(`click`, function () {
 
@@ -75,6 +96,29 @@ $(document).ready(async function () {
     }
   });
 
+  async function loadTags() {
+    let tags = sessionStorage.getItem(`tags`);
+    if (tags) {
+      return Promise.resolve(JSON.parse(tags));
+    }
+
+    return await $.ajax({
+      method: `GET`,
+      url: `${host}/api/tags?size=100000`,
+      contentType: `application/json`
+    }).then(function (data) {
+      sessionStorage.setItem(`tags`, JSON.stringify(data.content));
+      return data.content;
+    }).catch(function (response) {
+      if (response.responseJSON) {
+        console.error(response.responseJSON.message);
+      } else {
+        console.error(customErrorMessage);
+      }
+      return [];
+    });
+  }
+
 
   if (isEditMode) {
     $.ajax({
@@ -99,10 +143,21 @@ $(document).ready(async function () {
         if (post.imageUrl) {
 
           imagePreview.html(`<img src="${host}${post.imageUrl}" alt="Image Preview" />`);
-          imagePreview.css(`padding`, 0);
-          imagePreview.css(`border`, `none`)
 
+        } else {
+          imagePreview.html(`<img src="../static/images/default_post_thumbnail.png" alt="Image Preview" />`);
         }
+
+        imagePreview.css(`padding`, 0);
+        imagePreview.css(`border`, `none`)
+
+        imagePreview.on(`error`, function () {
+          const defaultSrc = '../static/images/default_post_thumbnail.png';
+          if ($(this).attr('src') !== defaultSrc) {
+            $(this).attr('src', defaultSrc);
+          }
+        });
+
 
 
         post.tags.forEach(tag => {
@@ -117,15 +172,13 @@ $(document).ready(async function () {
           $('#selected-tags').append(tagElement);
         });
 
-        if (sessionTags) {
-          sessionTags.then(sessionTagsList => {
-            sessionTagsList.forEach(existedTag => {
-              if (!selectedTags.has(existedTag.name.toLowerCase())) {
-                addExistedTags(existedTag);
-              }
-            });
+        loadTags().then(sessionTagsList => {
+          sessionTagsList.forEach(existedTag => {
+            if (!selectedTags.has(existedTag.name.toLowerCase())) {
+              addExistedTags(existedTag);
+            }
           });
-        }
+        });
       },
       error: function (response) {
         if (response.responseJSON) {
@@ -133,14 +186,16 @@ $(document).ready(async function () {
         } else {
           console.error(`An error occurred while sending the request, please try again later`)
         }
+      },
+      complete: function () {
+        $(`#loading-spinner`).hide();
       }
     });
   } else {
-    if (sessionTags) {
-      sessionTags.then(tagList => {
+    $(`#loading-spinner`).hide();
+      loadTags().then(tagList => {
         tagList.forEach(tag => addExistedTags(tag));
       });
-    }
   }
 
   $(document).on(`click`, `.save-post-update-button`, function (e) {
@@ -293,7 +348,7 @@ $(document).ready(async function () {
     const file = e.originalEvent.dataTransfer.files[0];
     if (file) {
       showImagePreview(file);
-      imageFileInput.prop(`files`, e.dataTransfer.files);
+      imageFileInput.prop(`files`, e.originalEvent.dataTransfer.files);
     }
   });
 
@@ -381,6 +436,10 @@ $(document).ready(async function () {
       formData.append(`postImage`, postImage);
     }
 
+    $(`.submit-btn`).prop(`disabled`, true);
+
+    $(`#loading-spinner`).show();
+
     $.ajax({
       method: apiRequestMethod,
       url: apiRequestUrl,
@@ -393,11 +452,15 @@ $(document).ready(async function () {
         window.location = `post.html?id=${post.id}`;
       },
       error: function (response) {
+        $(`.submit-btn`).prop(`disabled`, false);
         if (response.responseJSON) {
           console.error(response.responseJSON.message);
         } else {
           console.error(`An error occurred while sending the request, please try again later`)
         }
+      },
+      complete: function () {
+        $(`#loading-spinner`).hide();
       }
 
     });
@@ -466,7 +529,7 @@ $(document).ready(async function () {
     }
 
     $(`.image-preview`).removeClass(`error`);
-     $(`.image-upload-wrapper`).next(`.error-message`).css(`visibility`, `hidden`);
+    $(`.image-upload-wrapper`).next(`.error-message`).css(`visibility`, `hidden`);
     return true;
   }
 

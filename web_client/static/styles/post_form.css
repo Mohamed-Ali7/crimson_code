@@ -197,6 +197,7 @@ textarea:focus {
 }
 
 #post-category {
+  flex-grow: 1;
   display: inline-block;
   border: none;
   color: #ffffff;
@@ -204,7 +205,6 @@ textarea:focus {
   font-size: 1rem;
   background-color: transparent;
   outline: none;
-  -select: none;
   cursor: pointer;
 }
 
@@ -345,6 +345,14 @@ textarea:focus {
   cursor: pointer;
 }
 
+.submit-btn:disabled {
+  background: #4a8ab8;
+}
+
+.submit-btn:hover:disabled {
+  background: #4a8ab8;
+}
+
 .cancel-post-edit-button {
   margin-left: 1rem;
   background: linear-gradient(to left, #e05b02, #a33c00);
@@ -365,6 +373,11 @@ body.swal2-shown {
   overflow-y: auto !important;
 }
 
+@media(max-width: 62.5rem) {
+  .form-layout {
+    flex-direction: column;
+  }
+}
 
 @media(max-width: 43.75rem) {
 

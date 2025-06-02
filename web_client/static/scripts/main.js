@@ -1,5 +1,8 @@
+window.host = `http://localhost:8080`;
+
 $(document).ready(function () {
-  const host = `http://localhost:8080`;
+  const host = window.host;
+
   let isRefreshing = false;
   let pendingRequests = [];
   let refreshTimeout = null;
@@ -18,7 +21,8 @@ $(document).ready(function () {
               icon: 'warning',
               showCancelButton: true,
               confirmButtonText: 'Yes, login',
-              cancelButtonText: 'Stay here'
+              cancelButtonText: 'Stay here',
+              scrollbarPadding: false
             }).then((result) => {
               if (result.isConfirmed) {
                 window.location = 'login.html';
@@ -49,6 +53,7 @@ $(document).ready(function () {
               }, 100);
               isRefreshing = false;
             } else {
+              localStorage.removeItem(`user`);
 
               pendingRequests = [];
 
@@ -62,7 +67,8 @@ $(document).ready(function () {
                   icon: 'warning',
                   showCancelButton: true,
                   confirmButtonText: 'Yes, login',
-                  cancelButtonText: 'Stay here'
+                  cancelButtonText: 'Stay here',
+                  scrollbarPadding: false
                 }).then((result) => {
                   if (result.isConfirmed) {
                     window.location = 'login.html';
@@ -76,11 +82,17 @@ $(document).ready(function () {
         }
       },
       403: function (xhr) {
-        alert(xhr.responseJSON.message)
+        if (xhr.responseJSON) {
+          if (!window.location.pathname.includes(`login`)) {
+            alert(xhr.responseJSON.message);
+          }
+        }
         return;
       },
       404: function (xhr) {
-        window.location = 'not_found.html'
+        if (!window.location.pathname.includes(`index`)) {
+          window.location = 'not_found.html'
+        }
       }
     },
     beforeSend: function (xhr, settings) {
@@ -123,6 +135,8 @@ $(document).ready(function () {
 
       return true;
     }).catch(() => {
+      localStorage.removeItem(`user`);
+      Cookies.remove('refresh_token', { path: '/' });
       return false;
     });
   }

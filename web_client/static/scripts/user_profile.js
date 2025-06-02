@@ -1,5 +1,4 @@
 $(document).ready(async function () {
-  await window.initCommen();
 
   const host = window.host;
 
@@ -7,13 +6,20 @@ $(document).ready(async function () {
 
   const userProfileId = urlParams.get(`id`);
 
-  const accessToken = Cookies.get(`access_token`);
+  let accessToken = Cookies.get(`access_token`);
   let currentUserPublicId;
   let isAdmin;
 
   if (!userProfileId) {
     window.location = `not_found.html`;
     return;
+  }
+
+  let isUserLoggedIn = true;
+
+  if (!accessToken) {
+    isUserLoggedIn = await checkAuth();
+    accessToken = Cookies.get(`access_token`);
   }
 
   if (accessToken) {
@@ -46,6 +52,7 @@ $(document).ready(async function () {
 
       const profileAvatar = $(`.avatar`);
       const profileAvatarImage = $(`.avatar-image`);
+      const currentAvatar = $(`#current-avatar`);
 
       if (user.profileImgUrl) {
         profileAvatarImage.attr(`src`, `${host}${user.profileImgUrl}`);
@@ -53,10 +60,13 @@ $(document).ready(async function () {
         profileAvatarImage.attr(`src`, '../static/images/default_profile_pic.png');
       }
 
+      currentAvatar.attr(`src`, profileAvatarImage.attr(`src`));
+
       profileAvatarImage.on(`error`, function () {
         const defaultSrc = '../static/images/default_profile_pic.png';
         if ($(this).attr('src') !== defaultSrc) {
-          $(this).attr('src', defaultSrc);
+          profileAvatarImage.attr('src', defaultSrc);
+          currentAvatar.attr(`src`, defaultSrc);
         }
       });
 
@@ -78,7 +88,7 @@ $(document).ready(async function () {
 
         $(`#first-name`).val(user.firstName);
         $(`#last-name`).val(user.lastName);
-        $(`#current-avatar`).attr(`src`, profileAvatarImage.attr(`src`));
+
       } else if (isAdmin) {
         userInfo.append($(`.delete-account-btn`));
       }
@@ -90,7 +100,7 @@ $(document).ready(async function () {
 
     },
     error: function (response) {
-
+      $(`#loading-spinner`).hide();
       if (response.status === 404) {
         window.location = `not_found.html`;
       } else {
@@ -151,6 +161,9 @@ $(document).ready(async function () {
         } else {
           console.error(`An error occurred while sending the request, please try again later`)
         }
+      },
+      complete: function () {
+        $(`#loading-spinner`).hide();
       }
     });
   }
@@ -266,6 +279,8 @@ $(document).ready(async function () {
 
     e.preventDefault();
 
+    $(`#loading-spinner`).show();
+
     const updatePromises = [];
 
     const firstNameInput = $(`#first-name`);
@@ -277,8 +292,11 @@ $(document).ready(async function () {
       const lastName = lastNameInput.val().trim()
 
       if (!isNameValid(firstNameInput, `First Name`) || !isNameValid(lastNameInput, `Last Name`)) {
+        $(`#loading-spinner`).hide();
         return;
       }
+
+      $(`.save-btn`).prop(`disabled`, true);
 
       const nameUpdate = $.ajax({
         method: `PUT`,
@@ -287,13 +305,13 @@ $(document).ready(async function () {
         contentType: `application/json`,
         headers: { 'Authorization': 'Bearer ' + accessToken },
         success: function (updatedUser) {
-
           const fullName = `${updatedUser.firstName} ${updatedUser.lastName}`;
           $(`.user-profile-name`).text(fullName);
 
           $(`.profile-details .user-name`).text(fullName);
         },
         error: function (response) {
+          $(`.save-btn`).prop(`disabled`, false);
           if (response.responseJSON) {
             console.error(response.responseJSON.message);
           } else {
@@ -330,6 +348,7 @@ $(document).ready(async function () {
           };
         },
         error: function (response) {
+          $(`.save-btn`).prop(`disabled`, false);
           if (response.responseJSON) {
             console.error(response.responseJSON.message);
           } else {
@@ -370,6 +389,7 @@ $(document).ready(async function () {
 
       if (!isCurrentPasswordValid(currentPasswordInput) || !isNewPasswordValid(newPasswordInput) ||
         !isConfirmPasswordValid(confirmPasswordInput)) {
+        $(`#loading-spinner`).hide();
         return;
       }
 
@@ -386,6 +406,7 @@ $(document).ready(async function () {
         contentType: `application/json`,
         headers: { Authorization: 'Bearer ' + accessToken },
         error: function (response) {
+          $(`.save-btn`).prop(`disabled`, false);
           if (response.responseJSON) {
 
             if (response.status === 400) {
@@ -402,6 +423,7 @@ $(document).ready(async function () {
     }
 
     Promise.all(updatePromises).then(() => {
+      $(`#loading-spinner`).hide();
 
       Swal.fire({
         icon: 'success',
@@ -412,7 +434,20 @@ $(document).ready(async function () {
         scrollbarPadding: false
       });
       $(`#edit-profile-modal`).addClass(`hidden`);
-    })
+    }).catch((error) => {
+      if (error.status === 401) {
+        checkAuth(false).then(success => {
+          if (success) {
+            $(`#edit-profile-form`).submit();
+          }
+        });
+      } else {
+        console.error('An error occurred:', error);
+      }
+    }).finally(() => {
+      $(`#loading-spinner`).hide();
+    });
+    localStorage.removeItem(`user`);
 
   });
 
@@ -437,6 +472,7 @@ $(document).ready(async function () {
       scrollbarPadding: false
     }).then((result) => {
       if (result.isConfirmed) {
+        $(`#loading-spinner`).show();
         $.ajax({
           method: 'DELETE',
           url: `${host}/api/users/${userProfileId}`,
@@ -467,6 +503,9 @@ $(document).ready(async function () {
             } else {
               console.error(`An error occurred while sending the request, please try again later`)
             }
+          },
+          complete: function () {
+            $(`#loading-spinner`).hide();
           }
         });
       }

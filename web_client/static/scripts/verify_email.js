@@ -1,19 +1,25 @@
 $(document).ready(async function () {
 
-  await window.initCommen();
-
   const host = window.host;
 
-  if (Cookies.get(`access_token`)) {
+  const accessToken = Cookies.get(`access_token`);
+  let isUserLoggedIn = true;
+
+  if (!accessToken) {
+    isUserLoggedIn = await checkAuth();
+  }
+
+  if (isUserLoggedIn) {
     $.ajax({
       method: "GET",
       url: `${host}/api/users/me`,
-      headers: { 'Authorization': 'Bearer ' + Cookies.get(`access_token`) },
+      headers: { 'Authorization': 'Bearer ' + accessToken },
       success: () => {
-        window.location = `home.html`;
+        window.location = `home.html`
       }
     });
   }
+  
   
   const urlParams = new URLSearchParams(window.location.search);
 
@@ -33,6 +39,9 @@ $(document).ready(async function () {
     error: function(respose) {
       $(`.verify-failure`).show();
       $(`.send-verification-mail-btn`).show();
+    },
+    complete: function () {
+      $(`#loading-spinner`).hide();
     }
   });
 }); 

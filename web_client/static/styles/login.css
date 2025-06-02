@@ -114,6 +114,16 @@
   transition: background-color 0.3s;
 }
 
+.login-btn:disabled {
+  background-color: #944755;
+  cursor: default;
+}
+
+.login-btn:hover:disabled {
+  background-color: #944755;
+  cursor: default;
+}
+
 .login-btn:hover {
   background-color: #E94560;
 }

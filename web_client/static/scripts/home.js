@@ -1,5 +1,4 @@
 $(document).ready(async function () {
-  await window.initCommen();
 
   const host = window.host;
 
@@ -36,8 +35,10 @@ $(document).ready(async function () {
 
         const postCard = $(`<div class="post-card"></div>`).data(`post-id`, post.id);
 
+        const postImageContainer = $(`<div class="post-image-container"></div>`);
         const postImage = $(`<img class="post-image" alt="Post Thumbnail">`);
 
+        postImageContainer.append(postImage);
         if (post.imageUrl) {
           postImage.attr(`src`, `${host}${post.imageUrl}`);
         } else {
@@ -98,10 +99,9 @@ $(document).ready(async function () {
           postTags.append(tagSpan);
         })
 
-        // post.html not implemented yet
         const readMoreLink = $(`<a href="post.html?id=${post.id}" class="read-more">Read More</a>`);
 
-        postCard.append(postImage);
+        postCard.append(postImageContainer);
         postContent.append(postTitle, postExcerpt);
         authorInfo.append(authorName, postDate);
 
@@ -121,6 +121,9 @@ $(document).ready(async function () {
       } else {
         console.error(`An error occurred while sending the request, please try again later`)
       }
+    },
+    complete: function () {
+      $(`#loading-spinner`).hide();
     }
   });
 

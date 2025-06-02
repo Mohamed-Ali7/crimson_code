@@ -1,18 +1,25 @@
 $(document).ready(async function () {
-  await window.initCommen();
 
   const host = window.host;
 
-  if (Cookies.get(`access_token`)) {
+  const accessToken = Cookies.get(`access_token`);
+  let isUserLoggedIn = true;
+
+  if (!accessToken) {
+    isUserLoggedIn = await checkAuth();
+  }
+
+  if (isUserLoggedIn) {
     $.ajax({
       method: "GET",
       url: `${host}/api/users/me`,
-      headers: { 'Authorization': 'Bearer ' + Cookies.get(`access_token`) },
+      headers: { 'Authorization': 'Bearer ' + accessToken },
       success: () => {
-        window.location = `home.html`;
+        window.location = `home.html`
       }
     });
   }
+
   const urlParams = new URLSearchParams(window.location.search);
 
   const token = urlParams.get(`token`);
@@ -27,6 +34,9 @@ $(document).ready(async function () {
     error: function () {
       $(`.error-message-container`).show();
       $(`.requset-new-rest-link-btn`).show();
+    },
+    complete: function () {
+      $(`#loading-spinner`).hide();
     }
   });
 
@@ -103,6 +113,8 @@ $(document).ready(async function () {
       token: token,
     };
 
+    $(`#loading-spinner`).show();
+
     $.ajax({
       method: "POST",
       url: `${host}/api/users/password-reset/confirm`,
@@ -120,6 +132,9 @@ $(document).ready(async function () {
         } else {
           console.error(response.responseJSON.message);
         }
+      },
+      complete: function () {
+        $(`#loading-spinner`).hide();
       }
     });
   });

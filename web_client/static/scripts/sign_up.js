@@ -1,16 +1,21 @@
 $(document).ready(async function () {
 
-  await window.initCommen();
-
   const host = window.host;
 
-  if (Cookies.get(`access_token`)) {
+  const accessToken = Cookies.get(`access_token`);
+  let isUserLoggedIn = true;
+
+  if (!accessToken) {
+    isUserLoggedIn = await checkAuth();
+  }
+
+  if (isUserLoggedIn) {
     $.ajax({
       method: "GET",
       url: `${host}/api/users/me`,
-      headers: { 'Authorization': 'Bearer ' + Cookies.get(`access_token`) },
+      headers: { 'Authorization': 'Bearer ' + accessToken },
       success: () => {
-        window.location = `home.html`;
+        window.location = `home.html`
       }
     });
   }
@@ -128,6 +133,8 @@ $(document).ready(async function () {
       lastName: lastNameInput.val().trim(),
     };
 
+    $(`.sign-up-btn`).prop(`disabled`, true);
+    $(`#loading-spinner`).show();
     $.ajax({
       method: "POST",
       url: `${host}/api/auth/register`,
@@ -141,13 +148,16 @@ $(document).ready(async function () {
         window.location = `login.html`
       },
       error: (response) => {
-        
+        $(`.sign-up-btn`).prop(`disabled`, false);
         if(response.responseJSON.message === 'This email already exists') {
           $(`.email-input`).removeClass(`valid`);
           showError($(`.email-input`), response.responseJSON.message);
         } else {
           console.error(response.responseJSON.message)
         }
+      },
+      complete: function () {
+        $(`#loading-spinner`).hide();
       }
     });
   });

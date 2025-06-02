@@ -1,18 +1,15 @@
 $(document).ready(async function () {
 
-  await window.initCommen();
-
   const host = window.host;
 
-  const postIds = [36, 48];
+  $.ajax({
+    method: `GET`,
+    url: `${host}/api/posts?sort_dir=asc&size=2`,
+    success: function (postPage) {
 
-  for (let postId of postIds) {
+      const posts = postPage.content;
 
-    $.ajax({
-      method: `GET`,
-      url: `${host}/api/posts/${postId}`,
-      success: function (post) {
-
+      for (let post of posts) {
         const postCard = $(`<div class="post-card"></div>`).data(`post-id`, post.id);
 
         const postImage = $(`<img class="post-image" alt="Post Thumbnail">`);
@@ -35,15 +32,14 @@ $(document).ready(async function () {
         const postTitle = $(`<h3 class="post-title"></h3>`).text(post.title);
         const postExcerpt = $(`<p class="post-excerpt"></p>`).text(post.content);
 
-        // post.html not implemented yet
         const readMoreLink = $(`<a href="post.html?id=${post.id}" class="read-more">Read More</a>`);
 
         postContent.append(postTitle, postExcerpt, readMoreLink)
         postCard.append(postImage, postContent);
 
         $(`.post-grid`).append(postCard);
-
       }
-    });
-  }
+
+    }
+  });
 });

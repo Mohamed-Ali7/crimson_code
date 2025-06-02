@@ -1,19 +1,25 @@
 $(document).ready(async function () {
 
-  await window.initCommen();
-
   const host = window.host;
 
-  if (Cookies.get(`access_token`)) {
+  const accessToken = Cookies.get(`access_token`);
+  let isUserLoggedIn = true;
+
+  if (!accessToken) {
+    isUserLoggedIn = await checkAuth();
+  }
+
+  if (isUserLoggedIn) {
     $.ajax({
       method: "GET",
       url: `${host}/api/users/me`,
-      headers: { 'Authorization': 'Bearer ' + Cookies.get(`access_token`) },
+      headers: { 'Authorization': 'Bearer ' + accessToken },
       success: () => {
-        window.location = `home.html`;
+        window.location = `home.html`
       }
     });
   }
+
   function showError(inputField, message) {
     inputField.addClass('error');
     $('.error-message').css(`visibility`, `visible`).text(message);
@@ -55,6 +61,8 @@ $(document).ready(async function () {
       email: emailInput.val().trim(),
     };
 
+    $(`#loading-spinner`).show();
+
     $.ajax({
       method: "POST",
       url: `${host}/api/auth/email-verification-request`,
@@ -74,6 +82,9 @@ $(document).ready(async function () {
         } else if (response.status === 400) {
           showError($(`.email-input`), `Your email has been already verified`);
         }
+      },
+      complete: function () {
+        $(`#loading-spinner`).hide();
       }
     });
   });

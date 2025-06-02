@@ -3,7 +3,6 @@
   flex-direction: column;
   align-items: center;
   overflow: auto;
-  background-color: #f5f5f5;
 }
 
 .page-title {
@@ -29,7 +28,8 @@
   border-radius: 15px;
   margin-top: 3rem;
   margin-bottom: 2rem;
-  background-color: #ffffff;
+  background-color: #f5f5f5;
+
 }
 
 .post-card {
@@ -47,10 +47,16 @@
   transform: translateY(-5px);
 }
 
+.post-image-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  overflow: hidden;
+  height: 9.7rem;
+}
+
 .post-image {
   width: 100%;
-  height: 9.7rem;
-  object-fit: cover;
 }
 
 .post-content {
@@ -195,6 +201,16 @@
 
   .post-cards-wrapper {
     width: 100%;
+  }
+
+  .post-image-container {
+    width: 100%;
+  }
+
+  .post-image {
+    width: 100%;
+    height: 9.7rem;
+    object-fit: cover;
   }
 }
 

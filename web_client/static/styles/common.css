@@ -25,6 +25,34 @@ body {
   overflow-y: scroll;
 }
 
+.spinner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 6px solid #e0e0e0;
+  border-top-color: #ff3e3e;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .navbar {
   position: relative;
   width: 100%;
@@ -218,7 +246,7 @@ body {
   margin-top: 0.5rem;
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  width: 13rem;
+  width: 14rem;
   max-height: 18rem;
   z-index: 1000;
   cursor: auto;
@@ -231,14 +259,17 @@ body {
   margin: 0.6rem 0;
   font-size: 0.9rem;
   cursor: auto;
+  width: 100%;
 }
 
 .category-dropdown li a {
+  display: inline-block;
   cursor: pointer;
   transition: color 0.3s;
   color: #ffffff;
   text-decoration: none;
   user-select: none;
+  width: 100%;
 }
 
 .category-dropdown li a:hover {
@@ -567,8 +598,8 @@ body {
 
   .category-dropdown {
     top: 0;
-    right: 7.2rem;
-    padding: 0.5rem 1rem;
+    right: 7.1rem;
+    padding: 0.5rem 0.8rem;
     width: 12rem;
     margin: 0;
   }

@@ -109,6 +109,11 @@
   background-color: #E94560;
 }
 
+.sign-up-btn:disabled {
+  background-color: #944755;
+  cursor: default;
+}
+
 .sign-up-links {
   margin-top: 0.8rem;
   font-size: 0.9rem;
