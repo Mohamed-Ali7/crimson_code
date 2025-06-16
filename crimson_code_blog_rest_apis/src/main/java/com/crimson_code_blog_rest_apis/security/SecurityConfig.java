@@ -58,6 +58,7 @@ public class SecurityConfig {
 				.authorizeHttpRequests(authorize -> {
 					authorize.requestMatchers("/api/auth/logout").authenticated()
 					.requestMatchers(HttpMethod.GET, "/api/users/me").authenticated()
+					.requestMatchers("/api/users/*/follow/**").authenticated()
 					
 					/*
 					 * Permit access to get user by public id when using the request /api/users/{userId}
@@ -66,6 +67,7 @@ public class SecurityConfig {
 					 * and /** means Zero or more segments which means 
 					 * /api/users/{userId}/posts and /api/users/{userId} will match without any issue.
 					 */
+					
 					.requestMatchers(HttpMethod.GET, "/api/users/*/**").permitAll()
 					.requestMatchers("/api/users/password-reset/**").permitAll()
 					.requestMatchers(HttpMethod.GET, "/images/**").permitAll()
