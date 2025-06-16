@@ -43,6 +43,62 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
+-- Table structure for table `roles`
+--
+
+DROP TABLE IF EXISTS `roles`;
+
+CREATE TABLE `roles` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `name` varchar(40) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UKofx66keruapi6vyqpv6f2or37` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Table structure for table `users_roles`
+--
+
+DROP TABLE IF EXISTS `users_roles`;
+
+CREATE TABLE `users_roles` (
+  `user_id` bigint NOT NULL,
+  `role_id` bigint NOT NULL,
+  KEY `FKj6m8fwv7oqv74fcehir1a9ffy` (`role_id`),
+  KEY `FK2o0jvgh89lemvvo17cbqvdxaa` (`user_id`),
+  CONSTRAINT `FK2o0jvgh89lemvvo17cbqvdxaa` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `FKj6m8fwv7oqv74fcehir1a9ffy` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Table structure for table `user_followings`
+--
+
+DROP TABLE IF EXISTS `user_followings`;
+
+CREATE TABLE `user_followings` (
+	`follower_id` bigint NOT NULL,
+	`following_id` bigint NOT NULL,
+	PRIMARY KEY (`follower_id`, `following_id`),
+  	CONSTRAINT `fk_follower_id` FOREIGN KEY (`follower_id`) REFERENCES `users` (`id`),
+  	CONSTRAINT `fk_following_id` FOREIGN KEY (`following_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Table structure for table `categories`
+--
+
+DROP TABLE IF EXISTS `categories`;
+
+CREATE TABLE `categories` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `name` varchar(60) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UKt8o6pivur7nn124jehx7cygw5` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
 -- Table structure for table `posts`
 --
 
@@ -63,21 +119,6 @@ CREATE TABLE `posts` (
   KEY `FK5lidm6cqbc7u4xhqpxm898qme` (`user_id`),
   CONSTRAINT `FK5lidm6cqbc7u4xhqpxm898qme` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   CONSTRAINT `FKijnwr3brs8vaosl80jg9rp7uc` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-
---
--- Table structure for table `categories`
---
-
-DROP TABLE IF EXISTS `categories`;
-
-CREATE TABLE `categories` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `name` varchar(60) NOT NULL,
-  `description` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `UKt8o6pivur7nn124jehx7cygw5` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
@@ -147,22 +188,6 @@ CREATE TABLE `post_tags` (
   CONSTRAINT `FKm6cfovkyqvu5rlm6ahdx3eavj` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-
-
---
--- Table structure for table `roles`
---
-
-DROP TABLE IF EXISTS `roles`;
-
-CREATE TABLE `roles` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `name` varchar(40) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `UKofx66keruapi6vyqpv6f2or37` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-
 --
 -- Table structure for table `token_blacklist`
 --
@@ -175,22 +200,4 @@ CREATE TABLE `token_blacklist` (
   `token` text NOT NULL,
   `token_type` varchar(25) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-
-
-
---
--- Table structure for table `users_roles`
---
-
-DROP TABLE IF EXISTS `users_roles`;
-
-CREATE TABLE `users_roles` (
-  `user_id` bigint NOT NULL,
-  `role_id` bigint NOT NULL,
-  KEY `FKj6m8fwv7oqv74fcehir1a9ffy` (`role_id`),
-  KEY `FK2o0jvgh89lemvvo17cbqvdxaa` (`user_id`),
-  CONSTRAINT `FK2o0jvgh89lemvvo17cbqvdxaa` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `FKj6m8fwv7oqv74fcehir1a9ffy` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
