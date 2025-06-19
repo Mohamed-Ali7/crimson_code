@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -127,7 +128,16 @@ public class UserServiceImpl implements UserService {
 				.orElseThrow(() -> new ResourceNotFoundException("User does not exist with id: " + publicId));
 		
 		UserResponseModel userResponse = modelMapper.map(userEntity, UserResponseModel.class);
-
+		
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		
+		if (authentication != null && !(authentication.getPrincipal() instanceof String)) {
+			UserEntity authenticatedUser = ((UserPrincipal) authentication.getPrincipal()).getUserEntity();
+			boolean isFollowing = userRepository.isFollowing(authenticatedUser.getId(), userEntity.getId());
+			userResponse.setIsFollowing(isFollowing);
+			System.out.println(isFollowing);
+		}
+		
 		return userResponse;
 	}
 
