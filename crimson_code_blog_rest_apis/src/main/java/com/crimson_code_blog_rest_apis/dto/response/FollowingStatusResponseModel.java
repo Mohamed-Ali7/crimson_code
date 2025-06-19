@@ -2,7 +2,7 @@ package com.crimson_code_blog_rest_apis.dto.response;
 
 public class FollowingStatusResponseModel {
 
-	boolean isFollowing;
+	private boolean isFollowing;
 
 	public FollowingStatusResponseModel() {
 	}
@@ -11,11 +11,11 @@ public class FollowingStatusResponseModel {
 		this.isFollowing = isFollowing;
 	}
 
-	public boolean isFollowing() {
+	public boolean getIsFollowing() {
 		return isFollowing;
 	}
 
-	public void setFollowing(boolean isFollowing) {
+	public void setIsFollowing(boolean isFollowing) {
 		this.isFollowing = isFollowing;
 	}
 	

@@ -16,6 +16,7 @@ import com.crimson_code_blog_rest_apis.dto.response.FollowingStatusResponseModel
 import com.crimson_code_blog_rest_apis.dto.response.OperationStatusResponse;
 import com.crimson_code_blog_rest_apis.dto.response.PageResponseModel;
 import com.crimson_code_blog_rest_apis.dto.response.UserResponseModel;
+import com.crimson_code_blog_rest_apis.dto.response.UserSummaryResponseModel;
 import com.crimson_code_blog_rest_apis.security.UserPrincipal;
 import com.crimson_code_blog_rest_apis.services.FollowService;
 import com.crimson_code_blog_rest_apis.utils.OperationName;
@@ -67,7 +68,7 @@ public class FollowController {
 	}
 	
 	@GetMapping("/followers")
-	public ResponseEntity<PageResponseModel<UserResponseModel>> getFollowers(
+	public ResponseEntity<PageResponseModel<UserSummaryResponseModel>> getFollowers(
 			@PathVariable String targetUserId,
 			@RequestParam(name = "page", defaultValue = "0") int page,
 			@RequestParam(name = "size", defaultValue = "10") int pageSize,
@@ -81,7 +82,7 @@ public class FollowController {
 	}
 	
 	@GetMapping("/following")
-	public ResponseEntity<PageResponseModel<UserResponseModel>> getFollowing(
+	public ResponseEntity<PageResponseModel<UserSummaryResponseModel>> getFollowing(
 			@PathVariable String targetUserId,
 			@RequestParam(name = "page", defaultValue = "0") int page,
 			@RequestParam(name = "size", defaultValue = "10") int pageSize,
