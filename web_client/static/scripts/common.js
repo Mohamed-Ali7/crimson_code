@@ -1,3 +1,5 @@
+$(`head`).prepend(`<link rel="icon" type="image/png" href="../static/images/favicon.png">`);
+
 $(document).ready(async function () {
 
     const host = window.host;

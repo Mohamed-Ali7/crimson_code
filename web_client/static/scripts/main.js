@@ -90,7 +90,8 @@ $(document).ready(function () {
         return;
       },
       404: function (xhr) {
-        if (!window.location.pathname.includes(`index`)) {
+        const pathname = window.location.pathname;
+        if (!pathname.includes(`index`) && !pathname.includes(`email`) && !pathname.includes(`password`)) {
           window.location = 'not_found.html'
         }
       }

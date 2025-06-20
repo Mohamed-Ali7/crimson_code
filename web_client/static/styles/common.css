@@ -428,7 +428,7 @@ body {
 }
 
 .profile-dropdown .logout-btn {
- 
+
   background-color: #4b4a4a;
   color: #fffdfd;
 }
@@ -495,7 +495,7 @@ body {
   font-size: 1.2rem;
 }
 
-.footer-social div{
+.footer-social div {
   margin-top: 1rem;
 }
 
@@ -515,7 +515,7 @@ body {
   header.navbar {
     padding: 0 1.4rem;
   }
-  
+
   .logo {
     margin-left: -1.5rem;
   }
@@ -563,6 +563,14 @@ body {
     width: 1.4rem;
     height: 1.4rem;
     display: inline-block;
+  }
+
+  .profile-details .user-name {
+    max-width: 6rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .user-name .fa {
