@@ -409,6 +409,7 @@ $(document).ready(async function () {
       if (!isCurrentPasswordValid(currentPasswordInput) || !isNewPasswordValid(newPasswordInput) ||
         !isConfirmPasswordValid(confirmPasswordInput)) {
         $(`#loading-spinner`).hide();
+        $(`.save-btn`).prop(`disabled`, false);
         return;
       }
 
@@ -465,6 +466,7 @@ $(document).ready(async function () {
       }
     }).finally(() => {
       $(`#loading-spinner`).hide();
+      $(`.save-btn`).prop(`disabled`, false);
     });
     localStorage.removeItem(`user`);
 
@@ -724,7 +726,7 @@ $(document).ready(async function () {
   $(`.change-password-btn`).on(`click`, function () {
 
     if (window.innerWidth > 700) {
-      $(`.modal-content`).css(`width`, `80%`);
+      $(`.modal-content`).css(`width`, `90%`);
     }
 
     setTimeout(function () {
@@ -736,7 +738,7 @@ $(document).ready(async function () {
 
     $(`#password-fields`).addClass(`hidden`);
     if (window.innerWidth > 700) {
-      $(`.modal-content`).css(`width`, `40%`);
+      $(`.modal-content`).css(`width`, `33.8rem`);
     }
 
   });
