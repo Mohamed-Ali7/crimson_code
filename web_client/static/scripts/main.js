@@ -1,4 +1,4 @@
-window.host = `http://192.168.1.3:8080`;
+window.host = `http://192.168.1.4:8080`;
 
 $(document).ready(function () {
   const host = window.host;
@@ -57,7 +57,7 @@ $(document).ready(function () {
               isRefreshing = false;
             } else {
               $(`#loading-spinner`).hide();
-              localStorage.removeItem(`user`);
+              sessionStorage.removeItem(`user`);
 
               pendingRequests = [];
 
@@ -141,7 +141,7 @@ $(document).ready(function () {
 
       return true;
     }).catch(() => {
-      localStorage.removeItem(`user`);
+      sessionStorage.removeItem(`user`);
       Cookies.remove('refresh_token', { path: '/' });
       return false;
     });
