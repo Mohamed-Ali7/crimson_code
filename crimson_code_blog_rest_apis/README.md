@@ -91,7 +91,7 @@ The **Crimson Code REST APIs** are documented using **OpenAPI 3.0** and served v
 
 You can access the full API documentation here:
 
-🔗 **[Swagger UI – API Explorer](https://p01--crimson-code-apis--jn622yqytdjv.code.run/swagger-ui/index.html)**
+🔗 **[Swagger UI – API Explorer](https://crimson-code-api.onrender.com/swagger-ui/index.html)**
 
 This interactive UI lets you explore all available endpoints, view request/response schemas, and test APIs directly in the browser.
 

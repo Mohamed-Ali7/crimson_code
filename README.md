@@ -39,7 +39,7 @@ For detailed setup and usage instructions, please refer to the dedicated README 
   The backend includes OpenAPI (Swagger) documentation accessible when running the API service. See the backend README for details.
 
 - **Live Demo:**  
-  [Crimson Code Live Website](https://crimson-code.vercel.app/)
+  [Crimson Code Live Website](https://crimsoncode.vercel.app/)
 
 ---
 
